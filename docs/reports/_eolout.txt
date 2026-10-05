@@ -1,0 +1,60 @@
+================ git 内 CRLF 一致性验证 ================
+
+---- 1. 工作区文件（基准）----
+  [OK] 字节   got=639440 exp=639440
+  [OK] CRLF   got=8965 exp=8965
+  [OK] 裸 LF   got=0 exp=0
+  [OK] SHA256   got=db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee exp=db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee
+
+---- 2. git 对象层：cat-file blob HEAD:<file> ----
+  [OK] 字节   got=639440 exp=639440
+  [OK] CRLF   got=8965 exp=8965
+  [OK] 裸 LF   got=0 exp=0
+  [OK] SHA256   got=db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee exp=db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee
+
+---- 3. git archive 导出层：git archive --format=zip ----
+  导出包内条目：海底小纵队·探矿鲸娘.user.js
+  [OK] 字节   got=639440 exp=639440
+  [OK] CRLF   got=8965 exp=8965
+  [OK] 裸 LF   got=0 exp=0
+  [OK] SHA256   got=db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee exp=db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee
+  导出包字节 = 8298789
+
+---- 3b. 仓库内全部 .user.js 行尾普查 ----
+  ● 海底小纵队·探矿鲸娘.user.js                                 bytes= 639440 CRLF= 8965 裸LF=    0  发布件（必须 CRLF）
+  ○ docs/bisect/A_新样式+协议_还原打赏区.user.js                 bytes= 467227 CRLF=    0 裸LF= 7275  工装件（保留原貌）
+  ○ docs/bisect/B_旧样式+协议页.user.js                      bytes= 357934 CRLF=    0 裸LF= 7275  工装件（保留原貌）
+  ○ docs/bisect/C_新样式_无协议页.user.js                     bytes= 464410 CRLF=    0 裸LF= 7261  工装件（保留原貌）
+  ○ docs/bisect/D_最接近030_仅答题修复.user.js                 bytes= 355301 CRLF=    0 裸LF= 7261  工装件（保留原貌）
+  ○ docs/bisect/S1_无内联背景图.user.js                      bytes= 363193 CRLF=    0 裸LF= 7287  工装件（保留原貌）
+  ○ docs/bisect/S2_图标改回URL.user.js                     bytes= 422495 CRLF=    0 裸LF= 7373  工装件（保留原貌）
+  ○ docs/bisect/S3_完整040对照.user.js                     bytes= 467939 CRLF=    0 裸LF= 7373  工装件（保留原貌）
+  ○ docs/bisect/T1_去掉自诊断.user.js                       bytes= 468187 CRLF=    0 裸LF= 7382  工装件（保留原貌）
+  ○ docs/bisect/T2_去自诊断+旧CSS.user.js                   bytes= 358182 CRLF=    0 裸LF= 7285  工装件（保留原貌）
+  ○ docs/bisect/T3_再去掉协议页.user.js                      bytes= 355357 CRLF=    0 裸LF= 7266  工装件（保留原貌）
+  ○ docs/bisect/T4_再恢复tooltip.user.js                  bytes= 356181 CRLF=    0 裸LF= 7286  工装件（保留原貌）
+  ○ docs/repro/海底小纵队·探矿鲸娘.user.js                      bytes= 467134 CRLF=    0 裸LF= 7275  工装件（保留原貌）
+  ● docs/versions/v0.4.10.user.js                      bytes= 639645 CRLF= 8979 裸LF=    0  发布件（必须 CRLF）
+  ● docs/versions/v0.4.11.user.js                      bytes= 640151 CRLF= 8982 裸LF=    0  发布件（必须 CRLF）
+  ● docs/versions/v0.4.3.user.js                       bytes= 568934 CRLF= 8019 裸LF=    0  发布件（必须 CRLF）
+  ● docs/versions/v0.4.4.user.js                       bytes= 591109 CRLF= 8286 裸LF=    0  发布件（必须 CRLF）
+  ● docs/versions/v0.4.5.user.js                       bytes= 597742 CRLF= 8325 裸LF=    0  发布件（必须 CRLF）
+  ● docs/versions/v0.4.6.user.js                       bytes= 606483 CRLF= 8447 裸LF=    0  发布件（必须 CRLF）
+  ● docs/versions/v0.4.7.user.js                       bytes= 612048 CRLF= 8529 裸LF=    0  发布件（必须 CRLF）
+  ● docs/versions/v0.4.8.user.js                       bytes= 619622 CRLF= 8674 裸LF=    0  发布件（必须 CRLF）
+  ● docs/versions/v0.4.9.user.js                       bytes= 630656 CRLF= 8842 裸LF=    0  发布件（必须 CRLF）
+  小计：发布件 10 个（全部硬校验），工装件 12 个（保留原貌）
+
+---- 4. 历史版本快照（对象层逐字节）----
+  [OK] v0.4.10.user.js 与工作区逐字节一致且无裸 LF   got=(True, 0) exp=(True, 0)
+  [OK] v0.4.11.user.js 与工作区逐字节一致且无裸 LF   got=(True, 0) exp=(True, 0)
+  [OK] v0.4.3.user.js 与工作区逐字节一致且无裸 LF   got=(True, 0) exp=(True, 0)
+  [OK] v0.4.4.user.js 与工作区逐字节一致且无裸 LF   got=(True, 0) exp=(True, 0)
+  [OK] v0.4.5.user.js 与工作区逐字节一致且无裸 LF   got=(True, 0) exp=(True, 0)
+  [OK] v0.4.6.user.js 与工作区逐字节一致且无裸 LF   got=(True, 0) exp=(True, 0)
+  [OK] v0.4.7.user.js 与工作区逐字节一致且无裸 LF   got=(True, 0) exp=(True, 0)
+  [OK] v0.4.8.user.js 与工作区逐字节一致且无裸 LF   got=(True, 0) exp=(True, 0)
+  [OK] v0.4.9.user.js 与工作区逐字节一致且无裸 LF   got=(True, 0) exp=(True, 0)
+
+======================================================
+结论：仓库内脚本为逐字节 CRLF，可安全分发（fail=0）
