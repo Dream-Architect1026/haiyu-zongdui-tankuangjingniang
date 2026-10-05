@@ -1,0 +1,18 @@
+# 行尾与二进制策略
+#
+# 本项目的硬约束：`.user.js` 必须是 CRLF、裸 LF 为 0（见 docs/VERIFICATION.md）。
+# 因此对脚本本身**禁用一切行尾转换**（-text），让 git 逐字节存原文件：
+#   - 工作区检出 = 字节原样（CRLF）
+#   - 仓库对象与 `git archive` / 托管平台"下载 zip" = 同样 CRLF
+# 若改成默认的 text=auto，blob 会存成 LF，任何人从平台下载 zip 拿到的就是 LF 版本。
+*.user.js -text
+
+# 发布包与位图按二进制处理，不做行尾/编码推断
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+
+# 其余文本文件沿用 git 默认（不做强制转换）
