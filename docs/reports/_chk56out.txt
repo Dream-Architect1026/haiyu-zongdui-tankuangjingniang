@@ -1,0 +1,54 @@
+bytes=639645
+crlf=8979
+bareLF=0
+
+==== 1. HX_TAB_RETURN_MS ====
+  8628: const HX_TAB_RETURN_MS = 10000;
+  8682: hxAutoTabTimer = setTimeout(() => { try { hxReturnToMain(); } catch (error) { /* 忽略 */ } }, HX_TAB_RETURN_MS);
+
+==== 2. is-required 相关（CSS + 模板） ====
+  8256: + "\n.main-page .setting .el-form-item.is-required>.el-form-item__label{flex:0 0 auto!important;align-self:center;margin:0 7px 0 0!important;padding:1px 8px!important;border:1px solid rgba(255,152,152,.30)!important;border-radius:8px!important;background:linear-gradient(150deg,rgba(255,140,140,.13),rgba(255,140,140,.03))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.15)!important;font-size:11.5px!important;line-height:17px!important;height:auto!impo
+  8257: + "\n.main-page .setting .el-form-item.is-required>.el-form-item__label::before{color:#ff9a9a!important;margin-right:3px!important;font-size:11px!important}"
+
+==== 2b. el-form-item__label::before / 红星 ====
+  8257: + "\n.main-page .setting .el-form-item.is-required>.el-form-item__label::before{color:#ff9a9a!important;margin-right:3px!important;font-size:11px!important}"
+
+==== 3. 四个字段的字面 ====
+  ---- 倍速 ----
+    7: // @description  海底小纵队·探矿鲸娘：超星学习通自动刷课与 AI 答题助手，DeepSeek Flash 驱动智能答题，视频倍速、文档图书自动完成、字体解密，简洁高效。
+    1244: "视频倍速（1-2）": "倍速"
+    1247: ["倍速播放", "倍速"],
+    1370: { name: "倍速", value: 2, type: "number", min: 1, max: 2, step: 0.5 }
+    7080: const resumeRateParam = configStore.platformParams.cx.parts[0].params.find((p) => p.name.includes("倍速"));
+    7111: const rateParam = configStore.platformParams.cx.parts[0].params.find((p) => p.name.includes("倍速"));
+  ---- 操作间隔 ----
+    1239: "切换、答题间隔，单位秒": "操作间隔",
+    1250: ["操作间隔", "操作间隔"]
+    1383: { name: "操作间隔", value: 3, type: "number", min: 1 },
+  ---- 正确 ----
+    801: if (/^(?:正确|是|对|√|t|true|right)$/.test(normalized) || /^(?:正确|是|对)选择$/.test(normalized))
+    1240: "正确率达到多少自动提交": "正确阈值",
+    1242: "正确率阈值": "正确阈值",
+    1248: ["自动提交的正确率", "正确阈值"],
+    1384: { name: "正确阈值", value: 85, type: "number" },
+    1461: "你是“探矿鲸娘”的中文网课答题引擎，请根据题目与选项给出正确答案。",
+    1463: "1. 单选题：answer 仅含一个元素，为该正确选项的完整正文（与选项文字完全一致）；",
+    1464: "2. 多选题：answer 含全部正确选项的正文，顺序与选项一致；",
+    1466: "4. 判断题：answer 为 {\"answer\":[\"正确\"]} 或 {\"answer\":[\"错误\"]}；",
+    6714: if (/^(a)?(正确|是|对|√|t|true|right)$/.test(text))
+    6818: } else if (judgeText.match(/(^|,)(正确|是|对|√|T|ri|right|true)(,|$)/)) {
+    7186: logStore.addLog(`正确率才${configStore.otherParams.params[1].value}%，先攒着～`, "danger");
+    7189: logStore.addLog(`正确率达标，交卷！`, "success");
+    8434: （自动翻题关掉了哦 / 正确率不达标先攒着 / 这页没活儿歇会儿 / 第 n 题绊了一跤），
+    8437: 也能在真正中断 / 真正恢复时正确翻色。 */
+  ---- 相似 ----
+    1241: "答案相似度超过多少选择": "相似阈值",
+    1243: "相似度阈值": "相似阈值",
+    1249: ["答案相似度阈值", "相似阈值"],
+    1385: { name: "相似阈值", value: 85, type: "number", min: 0, max: 100, step: 1 }
+    6679: const thresholdParam = configStore.otherParams.params.find((param) => param.name.includes("相似"));
+    7126: return Number(((_a = configStore.otherParams.params.find((param) => param.name.includes("相似"))) == null ? void 0 : _a.value) ?? 85);
+
+==== 4. 设置页模板里 required 声明 ====
+  2040: required: ""
+  2087: required: "",

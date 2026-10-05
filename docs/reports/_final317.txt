@@ -1,0 +1,20 @@
+﻿SYNTAX exit:
+  OK
+bytes = 482037
+
+=== 常量 ===
+  const DEFAULT_CARD_WIDTH = "310px";
+  const PANEL_HEIGHT = 310;
+  const ANSWER_CARD_WIDTH = DEFAULT_CARD_WIDTH;
+  const PANEL_WIDTH = 310;
+  const MINIMIZED_PANEL_HEIGHT = 35;
+
+=== position:relative on .main-page (应为 0) ===
+  0
+=== background-size 310px 310px ===
+  1
+=== 打赏文案残留 校友/0.88/一分也是爱 (应为 0) ===
+  0
+=== 模型名 ===
+  const DEFAULT_AI_MODEL = "deepseek-flash";
+  const ALLOWED_AI_MODELS = ["deepseek-flash", "deepseek-v4-pro"];

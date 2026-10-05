@@ -1,0 +1,5 @@
+﻿path  = C:\Users\D_A\DoubaoWork\chats\2026-10-05\new-chat-4\海底小纵队·探矿鲸娘.user.js
+bytes = 612048
+mtime = 2026-10-05 20:35:11
+bak046 = 606483
+bak045 = 597742

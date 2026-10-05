@@ -1,0 +1,15 @@
+================ 垃圾清理结果（2026-10-05）================
+
+暂存区 _trash/ 内容 = 散件文件 794 个 + 目录 4 个
+垃圾目录明细：_edgeprof / _edgeprof2 / _ep3 / _epS（Edge 临时 profile）
+
+处置：
+  1) 先整体压缩留底 -> archive/_junk-removed-2026-10-05.zip（5522967 字节，5.27 MB）
+  2) 再永久删除 _trash/ 目录
+  3) 已确认 _trash/ 不复存在
+
+完整被删清单见：archive/_packing/_pack2_manifest.json（junkFiles / junkDirs 两个数组）
+操作流水见：archive/_packing/_pack2.txt
+
+注：本机 Recycle Bin 相关 .NET 接口被安全策略拦截（Add-Type / Reflection 均禁用），
+    故改用“先压缩留底、再永久删除”的方案，效果等价且可溯源。

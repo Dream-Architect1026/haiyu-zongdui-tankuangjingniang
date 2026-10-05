@@ -1,0 +1,56 @@
+输入 C:\Users\D_A\DoubaoWork\chats\2026-10-05\new-chat-4\海底小纵队·探矿鲸娘.user.js
+  字节=640151  CRLF=True  行=8983
+
+前置 sessionStorage 命中 = 4（期望 4：1 处注释 + 3 处代码，全在待删块内）
+前置 0.4.11 命中 = 18（含历史分节注释，本次只改其中 4 处语义位置）
+=== P1 删死代码：.usage-session CSS 规则 ===
+  [删] L8059 + "\n.main-page .usage-session{display:inline-flex;align-items:center;gap:5px;margin-left:auto;p ...
+  [删] L8060 + "\n.main-page .usage-session:hover{transform:translateY(-1px);border-color:rgba(56,226,255,.44 ...
+  [删] L8061 + "\n.main-page .usage-session__k{color:var(--hx-ink-dim)}" ...
+  [删] L8062 + "\n.main-page .usage-session__v{color:var(--hx-cyan);font-weight:700;font-variant-numeric:tabu ...
+
+=== P2 替换「本次」用量块：sessionStorage 基线 -> 内存基线 ===
+  替换区间 L1604 - L1649（共 46 行）
+  起始注释行：/* ── 「本次」用量：以本次启用脚本为界 ─────────────────────────────
+  结束行     ：};
+  已替换为 23 行内存基线实现
+
+=== P3 其余锚点替换 ===
+  [OK] P3.1 @version  (1 处)
+  [OK] P3.2 HX_BUILD  (1 处)
+  [OK] P3.3 通知页日志  (1 处)
+  [OK] P3.4 教程页页脚  (1 处)
+  [OK] P3.5 本次格 title 补归零提示  (1 处)
+  [OK] P3.6 本次格补 data-hx-cell  (1 处)
+  [OK] P3.7 点击绑定改指本次格  (1 处)
+  [OK] P3.8 reduced-motion 去掉死项  (1 处)
+  [OK] P3.9 追加 v0.4.12 CSS 块（5 条规则）于 L8249 之前
+
+=== P4 结构不变量 ===
+  [OK] unsafeWindow.sessionStorage 归零 got=0 exp=0
+  [OK] 代码里 sessionStorage 归零      got=0 exp=0
+  [OK] 选择器 ".usage-session" 归零    got=0 exp=0
+  [OK] CSS .main-page .usage-session 归零 got=0 exp=0
+  [OK] usage-session 全清（含注释）      got=0 exp=0
+  [OK] HX_SESSION_KEY 归零          got=0 exp=0
+  [OK] hxSessionStore 归零          got=0 exp=0
+  [OK] readSessionBase 归零         got=0 exp=0
+  [OK] writeSessionBase 归零        got=0 exp=0
+  [OK] 内存基线声明 1 处                 got=1 exp=1
+  [OK] sessionUsage 定义 1 处        got=1 exp=1
+  [OK] resetSessionUsage 定义 1 处   got=1 exp=1
+  [OK] 本次格标记 2 处（模板+绑定）           got=2 exp=2
+  [OK] 点击绑定新锚点 1 处                got=1 exp=1
+  [OK] 旧点击锚点归零                    got=0 exp=0
+  [OK] 语义 0.4.11 全清               got=14 exp=14
+  [OK] 0.4.12 版本串 7 处（4 语义 + 3 注释） got=7 exp=7
+  [OK] CRLF 文档属性保持                got=1 exp=1
+
+=== P5 落盘前语法预检（node --check）===
+  [OK] node --check 通过（exit 0）
+
+=== P6 落盘 ===
+  预览 bytes=639440  crlf=8965  bareLF=0
+  dry=False
+  备份已存在，跳过：C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42\_bak_0411.user.js
+  已写盘 C:\Users\D_A\DoubaoWork\chats\2026-10-05\new-chat-4\海底小纵队·探矿鲸娘.user.js

@@ -1,0 +1,8 @@
+ok A @version 0.4.1 -> 0.4.2
+ok A2 鏁欑▼椤甸〉鑴?v0.4.1 -> v0.4.2
+ok B whale-page 鏍?patchFlag 64 -> 0
+ok C 鍚姩鏃ュ織鍔犵増鏈爣璁?
+version now = 0.4.2
+chars: 558854 -> 558950 ; CRLF=7932 bareLF=0
+
+--py exit=0 ; node --check exit=0 ; bytes=565070--

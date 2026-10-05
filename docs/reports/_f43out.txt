@@ -1,0 +1,44 @@
+orig_bytes=591109
+orig_crlf=8286
+orig_bareLF=0
+normalized_LF=8286
+
+anchor layoutCss count=1
+needle[1] const HX_BUILD = "0.4.4";
+needle[1] .main-page .whale-hero.is-busy{flex-direction:row;gap:9px;padding:2px 
+needle[1] .main-page .whale-hero__balance{flex:0 0 auto;display:flex;align-items
+needle[1] .main-page .whale-hero.is-busy .whale-hero__balance{opacity:0;transfor
+needle[1] const _hoisted_3 = { class: "minus" };
+needle[1] class: "card_content"
+needle[1] .main-page .card-header .zoom-icon{color:var(--hx-ink-dim)!important;
+
+---- 0.4.4 occurrences: 6 ----
+  ...@name         海底小纵队 · 探矿鲸娘\n// @namespace    xinghong\n// @version      0.4.4\n// @author       X.H\n// @description  海...
+  ...te.toFixed(0) : rate.toFixed(1)) + " tok/s";\n  };\n  const HX_BUILD = "0.4.4";\n  const HX_RUN_ID = "hx" + Date.now()...
+  ...oped by <strong>X.H</strong></p><p class="guide-meta">海底小纵队 · 探矿鲸娘 · v0.4.4 · MIT License</p></footer>', 3);\n  cons...
+  ...     logStore.addLog("已同意用户协议", "success");\n      logStore.addLog("面板 0.4.4 \u00b7 \u6db2\u6001\u73bb\u7483\u5df2\u...
+  ...-align:center!important;font-size:12.5px!important}"\n  );\n\n  // ---- v0.4.4 液态玻璃（Liquid Glass）：悬浮胶囊 + 双态（静止 / 交互·吸顶...
+  ...：悬浮胶囊 + 双态（静止 / 交互·吸顶滚动）----\n  LAYOUT_CSS_PARTS.push(\n    "\n/* ==== v0.4.4 liquid glass ==== */"\n    + "\n.main-pa...
+全部 0.4.4 均为版本字面量，可安全全局替换
+
+new_css_lines=35
+  [OK] HX_BUILD 0.4.5 = 1 (expect 1)
+  [OK] 0.4.4 残留 = 0 (expect 0)
+  [OK] push 次数 = 5 (expect 5)
+  [OK] hxTabGlow 定义 = 1 (expect 1)
+  [OK] hxMiniGlow 定义 = 1 (expect 1)
+  [OK] hxTabGlow 引用 = 1 (expect 1)
+  [OK] hxMiniGlow 引用 = 1 (expect 1)
+  [OK] busy balance 归零 = 1 (expect 1)
+  [OK] avatar 不收缩 = 1 (expect 1)
+  [OK] 旧标签须条 = 1 (expect 1)
+
+--- written ---
+backup=C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42\_bak_044.user.js
+backup_bytes=591109
+new_bytes=597742
+new_crlf=8325
+new_bareLF=0
+new_lines=8326
+
+RESULT=PASS

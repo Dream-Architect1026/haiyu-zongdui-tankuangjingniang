@@ -1,0 +1,4 @@
+﻿ok C 杩佺Щ宸叉彃鍏?(+974 chars)
+chars=543685 CRLF=7687 bareLF=0
+
+check exit=0 ; bytes=549351

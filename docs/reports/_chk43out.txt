@@ -1,0 +1,23 @@
+bytes=568934
+utf8Chars=562450
+crlf=8019
+bareLF=0
+totalNewlines=8019
+logicalLines=8020
+bareLF_lineNumbers=
+endsWithNewline=false
+hasBOM=false
+--- markers ---
+@version      0.4.3 = 1
+HX_BUILD = 7
+HX_RUN_ID = 7
+sweepOtherPanels = 2
+__HX_DIAG__ = 2
+data-hx-panel = 1
+usage-build = 3
+whale-hero = 31
+setting-ai = 12
+el-empty = 11
+question_table = 12
+--- el-empty at lines ---
+7810,7811,7812,7813,7814,7831,7832,7833,7834,7835,7916

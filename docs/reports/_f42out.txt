@@ -1,0 +1,28 @@
+﻿EXIT=0
+  [OK] P1a @version
+  [OK] P1b HX_BUILD
+  [OK] P1c 鍚姩鏃ュ織
+  [OK] P1d 鏁欑▼椤甸〉鑴?
+  [OK] P2 鏈鐢ㄩ噺鍩虹嚎
+  [OK] P3a 寰芥爣 -> 鏈
+  [OK] P3b 鏈鐢ㄩ噺璁＄畻
+  [OK] P3c 绉婚櫎 .usage-build 鏍峰紡
+  [OK] P4 浣欓鏌ヨ
+  [OK] P5 hero 浣欓鑺傜偣
+  [OK] P6 鏍囬寰芥爣
+  [OK] P7a 璇婃柇鍏ュ彛
+  [OK] P7b 璇婃柇瀛楁
+  [OK] P7c 鎺㈤拡鏀圭敤 data-hx-build
+  [OK] P8 娑叉€佺幓鐠冪粦瀹?
+  [OK] P9 鍚姩鎺ョ嚎
+  [OK] P10 娑叉€佺幓鐠冩牱寮?
+
+瀹屾垚锛?68934 -> 591109 瀛楄妭锛?22175锛?
+CRLF = 8286
+瑁?LF = 0
+HX_BUILD 0.4.4 = 1
+usage-session = 9
+hero-balance = 27
+balanceStore = 39
+鏃?usage-build 娈嬬暀 = 0
+

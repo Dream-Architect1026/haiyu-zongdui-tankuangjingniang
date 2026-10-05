@@ -1,0 +1,68 @@
+字节数 = 591109
+CRLF = 8286
+裸 LF = 0（应为 0）
+语法解析：通过（vm.Script）
+CSS 装配区间：410970..574044 长度 163117
+区间内声明标识符 2 个；外部引用：DEFAULT_CARD_WIDTH, PANEL_HEIGHT
+真实求值：成功，装配后 CSS 长度 158337
+花括号终值深度 = 0（应为 0），历史最小 = 0（不应 <0）
+字面 '\\n' 污染 = 0（应为 0）
+真实换行 = 408
+
+CSS 规则存在性：
+  [有] 液态玻璃分节注释
+  [有] 液态玻璃变量集
+  [有] 标签条改玻璃胶囊行
+  [有] 去掉标签下划条
+  [有] 去掉导航横条
+  [有] 标签悬停浮起
+  [有] 标签悬停规则
+  [有] 悬停位移
+  [有] 标签激活态
+  [有] 去掉标签间竖分隔线
+  [有] 去掉导航伪元素竖线
+  [有] 标题栏鲸娘徽标
+  [有] 滚动触发态（标题栏）
+  [有] 滚动触发态（标签条）
+  [有] 「本次」用量胶囊
+  [有] 英雄区余额胶囊
+  [有] 余额加载动画
+  [有] 余额脉冲关键帧
+  [有] AI 卡片高模糊
+  [有] 教程卡中模糊
+  [有] 题目卡模糊
+  [有] 减弱动效媒体查询
+  [有] 吸底用量栏
+  [有] 空闲态 132px
+  [有] 作答态横排
+  [有] 呼吸动画
+  [有] AI 卡片描边
+
+JS 新增标识符：
+  [OK] HX_BUILD 命中 1
+  [OK] sessionKey 命中 1
+  [OK] sessionBase 命中 1/1
+  [OK] sessionUsage 命中 1/1
+  [OK] resetSessionUsage 命中 1/2
+  [OK] writeSessionBase 命中 1
+  [OK] balanceUrl 命中 1
+  [OK] readStoredApiKey 命中 1/1
+  [OK] balanceStore 命中 1
+  [OK] fetchBalance 命中 1/4
+  [OK] formatMoney 命中 1
+  [OK] heroBalanceHtml 命中 1/1
+  [OK] bindLiquidGlass 命中 1/1
+  [OK] diagHooks 命中 1/1
+
+结构不变量：
+  [OK] 0.4.3 残留 实际 0 / 期望 0
+  [OK] 0.4.4 出现 实际 6 / 期望 6
+  [OK] usage-build 残留 实际 0 / 期望 0
+  [OK] usage-session 类 实际 1 / 期望 1
+  [OK] hero-balance 节点 实际 1 / 期望 1
+  [OK] card-header__logo 节点 实际 1 / 期望 1
+  [OK] ElEmpty 残留 实际 0 / 期望 0
+  [OK] whale-page 根 实际 1 / 期望 1
+  [OK] 面板宿主标记 实际 1 / 期望 1
+
+==== 全部通过 ====

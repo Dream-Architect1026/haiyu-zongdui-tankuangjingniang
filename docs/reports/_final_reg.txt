@@ -1,0 +1,17 @@
+﻿push count: 1
+has question-list rule: True
+
+SYNTAX: OK
+=== options ===
+
+pass=25  fail=0
+ALL PASS
+
+
+
+=== donate ===
+
+RESULT   : PASS 鉁?
+
+
+

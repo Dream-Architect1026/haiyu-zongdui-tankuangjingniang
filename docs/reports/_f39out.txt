@@ -1,0 +1,18 @@
+ok A 閰嶇疆椤?resolve 琛ラ綈 el-input/el-select/el-option
+ok B 閰嶇疆椤甸《閮ㄦ彃鍏?AI 鍗＄墖
+ok C1 椴稿椤电Щ闄ゆ湭鐢?configStore
+ok C2 椴稿椤垫牴鑺傜偣 Fragment -> div.whale-page
+ok D ai-config -> whale-hero锛堢┖闂?浣滅瓟鍙屾€侊級
+ok E 绉婚櫎 el-empty 绌虹姸鎬佸潡
+ok F CSS 杩藉姞锛堥哺濞樺弻鎬?+ AI 鍗＄墖锛?
+chk div.setting-ai = 1
+chk whale-page = 1
+chk whale-hero = 1
+chk ElEmpty 璋冪敤 = 0
+chk ai-config VNode = 0
+chk resolve el-input = 1
+chk 姝ｆ枃瀛楃涓?涓讳汉鍒€?= 1
+chk 姝ｆ枃瀛楃涓?鍚冪櫧楗?= 1
+chars: 554186 -> 558855 ; CRLF=7931 bareLF=0
+
+--py exit=0 ; node --check exit=0 ; bytes=564971--

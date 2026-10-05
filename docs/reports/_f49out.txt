@@ -1,0 +1,17 @@
+=== 预检（共 5 项）===
+  [OK] hxFavCost 硬化 + hxFavMoney  期望=1 实际=1
+  [OK] meta-left 去 formatCost     期望=1 实际=1
+  [OK] meta-right 去 formatCost    期望=1 实际=1
+  [OK] paintFavCard 调用点 try       期望=1 实际=1
+  [OK] 说明文案措辞                     期望=1 实际=1
+
+负向自检：fav 块内 formatCost 残留 = 2（应为 0）
+
+写入后：fav 块内 formatCost 残留 = 0（应为 0）
+        hxFavMoney 定义 = 1，引用 = 2
+        _GM_getValue 兜底 = 1
+
+orig_chars=611136  new_chars=611656
+bytes=630656  crlf=8842  bare_lf=0
+
+已写入：C:\Users\D_A\DoubaoWork\chats\2026-10-05\new-chat-4\海底小纵队·探矿鲸娘.user.js

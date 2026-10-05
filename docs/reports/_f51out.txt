@@ -1,0 +1,22 @@
+=== 清理前 ===
+  formatRate 出现 = 1
+  formatRate( 调用 = 0
+  tok/s 出现 = 1
+
+=== 目标块匹配 ===
+  [OK] formatRate 函数块（含尾锚 HX_BUILD）出现 1 处（期望 1）
+
+=== 结构不变量 ===
+  [OK] formatRate 全清          got=0 exp=0
+  [OK] tok/s 全清               got=0 exp=0
+  [OK] HX_BUILD 保留            got=1 exp=1
+  [OK] formatCost 未误伤         got=1 exp=1
+  [OK] formatUptime 未误伤       got=1 exp=1
+  [OK] formatTokenCount 未误伤   got=1 exp=1
+  [OK] push 数不变               got=10 exp=10
+  [OK] layoutCss join         got=1 exp=1
+
+=== 结果 ===
+  dry=False
+  LF 行数 = 8980
+  已写盘 bytes=639645 crlf=8979 bareLF=0

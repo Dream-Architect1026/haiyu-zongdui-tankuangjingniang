@@ -1,0 +1,82 @@
+=========== 0.4.12 验收 ===========
+文件 C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42\repo\haiyu-zongdui-tankuangjingniang\海底小纵队·探矿鲸娘.user.js
+
+=== 1. 语法（vm.Script 解析，等价 node --check）===
+  [OK] 整文件解析通过
+  [OK] 对照基线 _bak_0411 亦可解析
+
+=== 2. 行尾（Node 逐字节）===
+  现行版 bytes=639440  CRLF=8965  裸LF=0
+  [OK] 现行版 裸 LF = 0                           got=0 exp=0
+  [OK] 现行版 字节 = 639440                        got=639440 exp=639440
+  基线   bytes=640151  CRLF=8982  裸LF=0
+  [OK] 基线   裸 LF = 0                          got=0 exp=0
+
+=== 3. CSS 装配：真跑一遍，不信字符串存在 ===
+  装配区间长度 = 186349
+  区间内声明 2 个；外部引用：DEFAULT_CARD_WIDTH, PANEL_HEIGHT
+  [OK] 真实求值成功，装配后 CSS 长度 = 179473
+  [OK] 花括号终值深度                                got=0 exp=0
+  [OK] 花括号最小深度 < 0 次数                         got=0 exp=0
+    最小深度 = 0
+  [OK] 字面 \n 污染                               got=0 exp=0
+    真实换行数 = 571
+
+=== 4. CSS 规则存在性（0.4.12 新增 + 死代码清除）===
+  [OK] 含 本次格 cursor:pointer                   got=true exp=true
+  [OK] 含 本次格悬停反馈                              got=true exp=true
+  [OK] 含 本次格按下不位移                             got=true exp=true
+  [OK] 含 本轮分节注释                               got=true exp=true
+  [OK] 不含 旧用量胶囊规则                             got=false exp=false
+
+=== 5. 级联顺序断言（新规则必须写在被覆盖的旧规则之后）===
+  [OK] 旧 .usage-cell 规则存在（被覆盖方）                offset=152029
+  [OK] 旧 .usage-cell:hover 存在（被覆盖方）            offset=152296
+  [OK] 新本次格规则 offset > 旧规则 offset              179158 > 152029
+  [OK] 新本次格规则 offset > 旧 hover offset          179158 > 152296
+  [OK] v0.4.12 块排在 v0.4.11 本轮块之后               175135 -> 179023
+
+=== 6. 「本次」用量：真值表（新逻辑） + 旧逻辑对照 ===
+  [OK] 新块已抠出                                   641 字符
+  [OK] 旧块已抠出（对照）                               1934 字符
+
+  ── 新逻辑（0.4.12 内存基线） ──
+     L1 首次加载（累计 0）                本次 = 0
+     L1 答题后（累计 20）                本次 = 20
+     L2 重新启用（累计 20）               本次 = 0
+     L2 再答一题（累计 26）               本次 = 6
+     L2 点击归零（累计 26）               本次 = 0
+
+  ── 旧逻辑（0.4.11 会话级存储 · 对照） ──
+     L1 首次加载（累计 0）                本次 = 0
+     L1 答题后（累计 20）                本次 = 20
+     L2 重新启用（累计 20）               本次 = 20
+     L2 再答一题（累计 26）               本次 = 26
+     L2 点击归零（累计 26）               本次 = 0
+
+  判据表：
+  [OK] 新 · L1 首次加载 = 0                        got=0 exp=0
+  [OK] 新 · L1 答题后 = 20                        got=20 exp=20
+  [OK] 新 · L2 重新启用 = 0（已修复）                   got=0 exp=0
+  [OK] 新 · L2 再答一题 = 6                        got=6 exp=6
+  [OK] 新 · L2 点击归零 = 0                        got=0 exp=0
+  [OK] 旧 · L2 重新启用 = 20（复现原 bug）              got=20 exp=20
+  [OK] 对照成立：旧逻辑确实不归零（20 ≠ 0）                   旧=20 新=0
+
+=== 7. 结构性不变量（源码）===
+  [OK] unsafeWindow.sessionStorage 归零         got=0 exp=0
+  [OK] readSessionBase 归零                     got=0 exp=0
+  [OK] usage-session 全清                       got=0 exp=0
+  [OK] data-hx-cell 标记数                       got=2 exp=2
+  [OK] closest('[data-hx-cell="session"]') 调用 1 处 got=1 exp=1
+  [OK] let sessionBase 声明 1 处                 got=1 exp=1
+  [OK] resetSessionUsage 定义 1 处               got=1 exp=1
+  [OK] resetSessionUsage 调用点 2 处（点击处理 + 探针）   got=2 exp=2
+  [OK] HX_BUILD = 0.4.12                      got=1 exp=1
+  [OK] @version 0.4.12                        got=1 exp=1
+  [OK] 通知页日志 0.4.12                           got=1 exp=1
+  [OK] 教程页页脚 v0.4.12                          got=1 exp=1
+  [OK] __HX_SESSION_RESET__ 探针保留              got=1 exp=1
+
+================================
+结论：全部通过（fail=0）

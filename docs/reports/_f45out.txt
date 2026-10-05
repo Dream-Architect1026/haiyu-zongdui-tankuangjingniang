@@ -1,0 +1,79 @@
+orig_bytes=597742
+orig_crlf=8325
+orig_bareLF=0
+normalized_LF=8325
+
+anchor join count=1
+anchor balanceTimer count=1
+anchor adoptedSheets count=1
+anchor diagBalance count=1
+anchor mountHook count=1
+needle[1] const HX_BUILD = "0.4.5";
+needle[1] const useQuestionStore = pinia.defineStore("questionStore", {
+needle[1] const useLogStore = pinia.defineStore("logStore", {
+needle[1] const _hoisted_3 = { class: "minus" };
+needle[1] class: "card_content"
+needle[1] const PANEL_HEIGHT =
+needle[1] background:rgba(255,255,255,.07)!important;transform:translateY(-1px);
+needle[1] border-color:rgba(56,226,255,.32)!important;transform:translateY(-1px);
+needle[1] rgba(8,18,38,.30))!important;transform:translateY(-2px);
+needle[1] rgba(155,107,255,.22))!important;transform:translateY(-2px);
+
+旧 translateY 标签规则数 = 4
+
+---- 0.4.5 occurrences: 8 ----
+  ...底小纵队 · 探矿鲸娘\n// @namespace    xinghong\n// @version      0.4.5\n// @author       X.H\n// @description  海底小纵队·探矿鲸娘：超星学习通...
+  ... rate.toFixed(1)) + " tok/s";\n  };\n  const HX_BUILD = "0.4.5";\n  const HX_RUN_ID = "hx" + Date.now().toString(36) +...
+  ...>X.H</strong></p><p class="guide-meta">海底小纵队 · 探矿鲸娘 · v0.4.5 · MIT License</p></footer>', 3);\n  const _hoisted_3$9 ...
+  ...ddLog("已同意用户协议", "success");\n      logStore.addLog("面板 0.4.5 \u00b7 \u6db2\u6001\u73bb\u7483\u5df2\u52a0\u8f7d", "s...
+  ...mportant;font-size:12.5px!important}"\n  );\n\n  // ---- v0.4.5 液态玻璃（Liquid Glass）：悬浮胶囊 + 双态（静止 / 交互·吸顶滚动）----\n  LAYOU...
+  ... 交互·吸顶滚动）----\n  LAYOUT_CSS_PARTS.push(\n    "\n/* ==== v0.4.5 liquid glass ==== */"\n    + "\n.main-page{--lg-rim:rgb...
+  ...on-card{transition-duration:.01ms}}"\n  );\n    // ---- v0.4.5 ----\n  LAYOUT_CSS_PARTS.push(\n    "\n/* ==== v0.4.5 : ...
+  ...- v0.4.5 ----\n  LAYOUT_CSS_PARTS.push(\n    "\n/* ==== v0.4.5 : hero 作答态修复 + 标签独立胶囊 + 最小化美化 ==== */"\n    + "\n/* ---...
+全部 0.4.5 均为版本字面量，可安全全局替换
+
+new_css_lines=47
+
+computed: useQuestionStore=6 ver=10 dotClass=10 dotKeys=3 keyframes=2
+  [OK] HX_BUILD 0.4.6 = 1 (expect 1)
+  [OK] 0.4.5 残留 = 0 (expect 0)
+  [OK] 0.4.6 出现 = 10 (expect 10)
+  [OK] push 次数 = 6 (expect 6)
+  [OK] hxStatusTimer 声明 = 1 (expect 1)
+  [OK] HX_MINIMIZED_HEIGHT 已移除 = 0 (expect 0)
+  [OK] 最小化高度用实测变量 = 2 (expect 2)
+  [OK] 实测写入 --hx-min-h = 1 (expect 1)
+  [OK] readPanelStatus 定义 = 1 (expect 1)
+  [OK] readPanelStatus 引用 = 3 (expect 3)
+  [OK] syncStatusDot 定义 = 1 (expect 1)
+  [OK] syncStatusDot 引用 = 3 (expect 3)
+  [OK] bindStatusDot 定义 = 1 (expect 1)
+  [OK] bindStatusDot 调用 = 1 (expect 1)
+  [OK] __HX_STATUS__ 探针 = 1 (expect 1)
+  [OK] useQuestionStore 调用 = 6 (expect 6)
+  [OK] 状态灯类名 = 10 (expect 10)
+  [OK] 取消位移规则 = 1 (expect 1)
+  [OK] 标签行叠层 = 1 (expect 1)
+  [OK] 最小化只留标题栏 = 1 (expect 1)
+  [OK] 最小化取消脉冲 = 1 (expect 1)
+  [OK] 最小化高度过渡 = 1 (expect 1)
+  [OK] 页面切换动效 = 1 (expect 1)
+  [OK] 卡片入场动效 = 1 (expect 1)
+  [OK] 日志入场动效 = 1 (expect 1)
+  [OK] 空闲浮动动效 = 1 (expect 1)
+  [OK] 一次性动效用 backwards = 3 (expect 3)
+  [OK] 状态灯 3 色 = 3 (expect 3)
+  [OK] 灯关键帧 = 2 (expect 2)
+  [OK] 旧位移仍在(被覆盖) = 4 (expect 4)
+  [OK] 未用 important 压掉呼吸动画 = 0 (expect 0)
+  [OK] join 保留 = 1 (expect 1)
+
+--- written ---
+backup=C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42\_bak_045.user.js
+backup_bytes=597742
+new_bytes=606467
+new_crlf=8447
+new_bareLF=0
+new_lines=8448
+
+RESULT=PASS

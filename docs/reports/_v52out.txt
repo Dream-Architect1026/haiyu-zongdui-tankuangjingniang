@@ -1,0 +1,75 @@
+字节数 = 640151
+CRLF = 8982
+裸 LF = 0（应为 0）
+语法解析：通过（vm.Script）
+
+CSS 装配区间长度 186657
+区间内声明 2 个；外部引用：DEFAULT_CARD_WIDTH, PANEL_HEIGHT
+真实求值：成功，装配后 CSS 长度 179834
+花括号终值深度 = 0（应为 0），历史最小 = 0（不应 <0）
+字面 反斜杠n 污染 = 0（应为 0）
+真实换行 = 570
+
+=== 2. 数值参数行（倍速/操作间隔/正确阈值/相似阈值）真实级联求解 ===
+解析出规则 486 条
+  .is-required 行 标签 flex = 0 0 auto    <= /* --- D. 必填红星标签 -> 小胶囊 dock（不再与旁边环境割裂） --- */ .main-page .setting .el-form-item.is-required>.el-form-item__label  [spec 0-5-2, !important]
+  .is-required 行 标签 border = 1px solid rgba(140,200,255,.24)    <= /* --- D. 必填红星标签 -> 小胶囊 dock（不再与旁边环境割裂） --- */ .main-page .setting .el-form-item.is-required>.el-form-item__label  [spec 0-5-2, !important]
+  .is-required 行 标签 border-radius = 8px    <= /* --- D. 必填红星标签 -> 小胶囊 dock（不再与旁边环境割裂） --- */ .main-page .setting .el-form-item.is-required>.el-form-item__label  [spec 0-5-2, !important]
+  .is-required 行 标签 padding = 1px 8px    <= /* --- D. 必填红星标签 -> 小胶囊 dock（不再与旁边环境割裂） --- */ .main-page .setting .el-form-item.is-required>.el-form-item__label  [spec 0-5-2, !important]
+  .is-required 行 标签 margin = 0 8px 0 0    <= /* --- D. 必填红星标签 -> 小胶囊 dock（不再与旁边环境割裂） --- */ .main-page .setting .el-form-item.is-required>.el-form-item__label  [spec 0-5-2, !important]
+  .is-required 行 控件 flex = 0 0 auto    <= /* --- B3. 标签变胶囊后 flex:0 0 auto 不再撑开行，调节控件会跑到左边；显式推回本行右侧 --- */ .main-page .setting .el-form-item.is-required>.el-form-item__content  [spec 0-5-3, !important]
+  .is-required 行 控件 margin-left = auto    <= /* --- B3. 标签变胶囊后 flex:0 0 auto 不再撑开行，调节控件会跑到左边；显式推回本行右侧 --- */ .main-page .setting .el-form-item.is-required>.el-form-item__content  [spec 0-5-3, !important]
+  .is-required 行 控件 justify-content = flex-end    <= /* --- B3. 标签变胶囊后 flex:0 0 auto 不再撑开行，调节控件会跑到左边；显式推回本行右侧 --- */ .main-page .setting .el-form-item.is-required>.el-form-item__content  [spec 0-5-3]
+  .is-required 行 星号 display = none    <= /* --- B2. 必填星号已按要求隐藏。注意 required 属性必须留在模板里：小胶囊的样式选择器就是 .is-required，删掉属性会连胶囊一起没了 --- */ .main-page .setting .el-form-item.is-required>.el-form-item__label::before  [spec 0-7-2, !important]
+
+  断言：
+    [OK] 标签 flex 收缩为胶囊（不撑满行）  got="0 0 auto"  want="0 0 auto"
+    [OK] 标签圆角 8px（小胶囊）  含 8px
+    [OK] 标签描边为常规玻璃冷蓝  含 140,200,255
+    [OK] 标签描边已无粉红  不含 255,152,152
+    [OK] 控件 margin-left:auto（推到行右侧）  got="auto"  want="auto"
+    [OK] 控件 flex:0 0 auto（不被拉伸）  got="0 0 auto"  want="0 0 auto"
+    [OK] 控件靠右对齐  got="flex-end"  want="flex-end"
+    [OK] 必填星号已隐藏  got="none"  want="none"
+
+  反向对照（剔除 B3 规则后重算 margin-left，应回落到 8px）：
+    [OK] 无 B3 时 margin-left = "8px"（≠auto 才能证明 B3 有效）
+
+级联顺序（新规则必须晚于被它覆盖的旧规则）：
+  [OK] 新块 晚于 好感度面板块 (新@175947 > 旧@173095)
+  [OK] 新块 晚于 液态玻璃块 (新@175947 > 旧@146969)
+  [OK] 必填胶囊 晚于 表单标签基样式 (新@176815 > 旧@128877)
+  [OK] 控件推右 晚于 控件基样式 (新@177371 > 旧@129087)
+
+=== 3. 智能路由：状态页停留 3s ===
+  [OK] HX_TAB_RETURN_MS = 3000  got=1 exp=1
+  [OK] 旧值 10000 已无  got=0 exp=0
+  [OK] 定时器引用该常量  got=1 exp=1
+  [OK] 无写死 10000 的定时器  got=0 exp=0
+  [OK] 答题中不跳（busy 早返回）  got=1 exp=1
+  [OK] 答题结束必跳一次  got=1 exp=1
+  [OK] 注释已同步 3s  got=1 exp=1
+
+=== 4. 模板结构 ===
+  [OK] required 属性保留（胶囊选择器依赖）  got=2 exp=2
+  [OK] is-required 胶囊规则仍唯一  got=1 exp=1
+  [OK] B3 推右规则唯一  got=1 exp=1
+  [OK] 行基础 flex 排布仍在  got=1 exp=1
+  [OK] AI 卡字段胶囊未误伤  got=1 exp=1
+  [OK] 旧粉星号色已清零  got=0 exp=0
+  [OK] 旧粉描边已清零  got=0 exp=0
+  [OK] 版本 0.4.11  got=18 exp=18
+
+=== 5. 旧功能回归点 ===
+  [OK] 鲸娘双态文案  got=1 min=1
+  [OK] 作答态文案  got=1 min=1
+  [OK] 好感度卡片挂载  got=1 min=1
+  [OK] 状态灯三色  got=1 min=1
+  [OK] 状态灯读日志（新版判定）  got=1 min=1
+  [OK] 用量栏：本次  got=1 min=1
+  [OK] 用量栏：好感度胶囊  got=1 min=1
+  [OK] tok/s 已清除  got=0 min=0
+  [OK] 探针 __HX_FAV__  got=1 min=1
+  [OK] 探针 __HX_TAB__  got=1 min=1
+
+===== 全部通过（fail=0）=====

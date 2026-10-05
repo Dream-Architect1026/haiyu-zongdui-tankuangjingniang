@@ -1,0 +1,30 @@
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志与临时
+*.log
+*.bak
+*.tmp
+*~
+__pycache__/
+*.pyc
+
+# 构建产物（releases/ 下的发布包是有意提交的，故不整体忽略 *.zip）
+dist/
+build/
+
+# 本地开发工作区（不属于仓库内容）
+_*/
+archive/_packing/
+# 整理留底包与记账文件：仅在本地存证，不进仓库
+archive/*.zip
+archive/journal.json
+archive/ledger.json

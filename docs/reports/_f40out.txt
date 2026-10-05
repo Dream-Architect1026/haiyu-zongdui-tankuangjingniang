@@ -1,0 +1,15 @@
+python.exe : Traceback (most recent call last):
+所在位置 行:449 字符: 1
++ & $py "$w\_fix40.py" *> "$w\_f40.txt"
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last) 
+   ::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42\_fix40.py", line 55, in <mod
+ule>
+    assert t.count("0.4.1") == 0, "浠嶆湁 0.4.1 娈嬬暀: %d" % t.count("0.4.1")
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 浠嶆湁 0.4.1 娈嬬暀: 1
+
+--py exit=1 ; node --check exit=0 ; bytes=564970--

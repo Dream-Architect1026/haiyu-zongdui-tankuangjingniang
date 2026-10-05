@@ -1,0 +1,16 @@
+﻿SYNTAX: OK
+大小: 470274
+
+
+decrypted: 38432 bytes
+JPEG magic: ffd8ff (ffd8ff = JPEG)
+RESULT   : PASS 鉁?
+
+
+
+
+pass=25  fail=0
+ALL PASS
+
+
+
