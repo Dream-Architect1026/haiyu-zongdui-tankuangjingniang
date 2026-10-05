@@ -7,6 +7,7 @@ docs/
 ├── README.md            # 本文件
 ├── DEVELOPMENT.md       # 开发纪要（按版本，含根因与决策）
 ├── VERIFICATION.md      # 验收方法论与凭据
+├── PUBLISH-AUDIT.md     # 公开前自查台账（敏感信息扫描 + 两项已知特征）
 ├── versions/            # 历史版本链（9 个 .user.js）
 ├── tools/
 │   ├── patches/         # 补丁脚本（67 个）
