@@ -17,7 +17,7 @@
 
 ---
 
-视频介绍；9.74 复制打开抖音，看看【D&A（坐牢Beat的作品】你的学习通专属萌宠已上线 # 学习通 # 小白也可... https://v.douyin.com/yT--Bm7V7R0/ j@P.kP 06/11 fbn:/ :2pm 
+视频介绍：https://v.douyin.com/yT--Bm7V7R0/ j@P.kP 06/11 fbn:/ :2pm 
 
 ---
 
