@@ -139,7 +139,7 @@
 ├── 海底小纵队·探矿鲸娘.user.js   # 现行版本 0.4.12
 ├── CHANGELOG.md                  # 完整更新说明（0.2.7 → 0.4.12）
 ├── LICENSE                       # MIT
-├── assets/                       # 图标、背景、打赏码
+├── assets/                       # 图标、打赏码（README 展示用）
 └── releases/                     # 发布包（zip + SHA256SUMS）
 ```
 

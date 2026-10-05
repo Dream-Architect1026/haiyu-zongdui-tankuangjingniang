@@ -23,8 +23,6 @@ build/
 
 # 本地开发工作区（不属于仓库内容）
 _*/
-archive/_packing/
-# 整理留底包与记账文件：仅在本地存证，不进仓库
-archive/*.zip
-archive/journal.json
-archive/ledger.json
+
+# 整理留底与记账：纯本地存证，一律不进仓库
+archive/
