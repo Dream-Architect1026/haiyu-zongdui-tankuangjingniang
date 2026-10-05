@@ -140,15 +140,7 @@
 ├── CHANGELOG.md                  # 完整更新说明（0.2.7 → 0.4.12）
 ├── LICENSE                       # MIT
 ├── assets/                       # 图标、背景、打赏码
-├── preview/                      # 界面预览图
-├── releases/                     # 发布包（zip + SHA256SUMS）
-└── docs/
-    ├── README.md                 # 材料索引
-    ├── DEVELOPMENT.md            # 开发纪要（按版本）
-    ├── VERIFICATION.md           # 验收方法与凭据
-    ├── versions/                 # 历史版本链（v0.4.3 → v0.4.11）
-    ├── tools/                    # 补丁脚本与验收脚本
-    └── reports/                  # 各轮验收报告
+└── releases/                     # 发布包（zip + SHA256SUMS）
 ```
 
 ---

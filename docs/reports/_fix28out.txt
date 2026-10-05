@@ -1,4 +1,0 @@
-﻿done
-
-check exit=0
-bytes=548989

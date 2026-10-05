@@ -1,27 +1,0 @@
-﻿SYNTAX final: OK
-bytes: 473566  (prod 470600)
-
-=== ① 模型清单（应与服务端一致）===
-  const DEFAULT_AI_MODEL = "deepseek-flash";
-  const ALLOWED_AI_MODELS = ["deepseek-flash", "deepseek-v4-pro"];
-  const jsonModeModels = ["deepseek-flash"];
-  选项 value 唯一性:
-     deepseek-v4-pro
-     deepseek-flash
-  残留 v4.1-flash / deepseek-chat: 0
-
-=== ② 尺寸常量（应与 PROD 一致）===
-  TEST const DEFAULT_CARD_WIDTH = "360px";
-  PROD const DEFAULT_CARD_WIDTH = "360px";
-  TEST const ANSWER_CARD_WIDTH = DEFAULT_CARD_WIDTH;
-  PROD const ANSWER_CARD_WIDTH = DEFAULT_CARD_WIDTH;
-
-=== ③ 下拉弹层修复 ===
-  document级 EP 注入: 1
-  POPPER 主题注入:    1
-  z-index 2147483000: 1
-
-=== ④ 回归 ===
-  [选项匹配] pass=25  fail=0 / ALL PASS
-  [打赏图]   JPEG magic: ffd8ff (ffd8ff = JPEG) / RESULT   : PASS 鉁?
-  [综合]     RESULT   : PASS 鉁?ok

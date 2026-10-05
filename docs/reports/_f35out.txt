@@ -1,7 +1,0 @@
-!! A 杩佺Щ琛ㄩ敋鐐瑰懡涓?0
-ok B alignConfigLabels 宸叉彃鍏?
-ok B migrateConfig 鍐呭凡璋冪敤 alignConfigLabels
-chars: 545769 -> 546465 ; CRLF=7731 bareLF=0
-HAS_FAIL
-
---syntax exit=0 ; bytes=552151--

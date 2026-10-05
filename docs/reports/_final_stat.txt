@@ -1,4 +1,0 @@
-﻿path  = C:\Users\D_A\DoubaoWork\chats\2026-10-05\new-chat-4\海底小纵队·探矿鲸娘.user.js
-bytes = 591109
-mtime = 2026-10-05 19:57:31
-backup_0.4.3_bytes = 568934

@@ -1,7 +1,0 @@
-ok A deepseek-flash 浠锋牸 0.05/1.5/4.5 -> 0.02/1/4
-ok B 骞冲嘲 -> 绌洪棽
-ok C isPeakHour 娉ㄩ噴
-chk: flash=6 off0.02=1 peak0.04=1 鏃у钩宄?0 鏂扮┖闂?1 鏃т环娈嬬暀=0
-chars: 553901 -> 554186 ; CRLF=7884 bareLF=0
-
---py exit=0 ; node --check exit=0 ; bytes=560282--

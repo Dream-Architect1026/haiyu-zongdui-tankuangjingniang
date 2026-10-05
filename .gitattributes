@@ -1,6 +1,6 @@
 # 行尾与二进制策略
 #
-# 本项目的硬约束：`.user.js` 必须是 CRLF、裸 LF 为 0（见 docs/VERIFICATION.md）。
+# 本项目的硬约束：`.user.js` 必须是 CRLF、裸 LF 为 0。
 # 因此对脚本本身**禁用一切行尾转换**（-text），让 git 逐字节存原文件：
 #   - 工作区检出 = 字节原样（CRLF）
 #   - 仓库对象与 `git archive` / 托管平台"下载 zip" = 同样 CRLF
