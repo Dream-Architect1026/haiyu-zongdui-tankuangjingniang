@@ -1,9 +1,11 @@
 =========== 0.4.12 验收 ===========
 文件 C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42\repo\haiyu-zongdui-tankuangjingniang\海底小纵队·探矿鲸娘.user.js
+基线 docs/versions/v0.4.11.user.js  （候选命中 = 0）
 
 === 1. 语法（vm.Script 解析，等价 node --check）===
   [OK] 整文件解析通过
-  [OK] 对照基线 _bak_0411 亦可解析
+  [OK] 对照基线（0.4.11）亦可解析
+  [OK] 对照基线 SHA256 = v0.4.11 官方值              got=9c290a8346fce5e7bf158111a21f834b4ac6142ed8f83f0cef47bf4fbbf81a97 exp=9c290a8346fce5e7bf158111a21f834b4ac6142ed8f83f0cef47bf4fbbf81a97
 
 === 2. 行尾（Node 逐字节）===
   现行版 bytes=639440  CRLF=8965  裸LF=0
@@ -11,6 +13,7 @@
   [OK] 现行版 字节 = 639440                        got=639440 exp=639440
   基线   bytes=640151  CRLF=8982  裸LF=0
   [OK] 基线   裸 LF = 0                          got=0 exp=0
+  [OK] 基线   字节 = 640151（v0.4.11 官方值）          got=640151 exp=640151
 
 === 3. CSS 装配：真跑一遍，不信字符串存在 ===
   装配区间长度 = 186349

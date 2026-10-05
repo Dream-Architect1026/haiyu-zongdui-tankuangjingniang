@@ -18,7 +18,7 @@
   [OK] CRLF   got=8965 exp=8965
   [OK] 裸 LF   got=0 exp=0
   [OK] SHA256   got=db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee exp=db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee
-  导出包字节 = 8298789
+  导出包字节 = 8303488
 
 ---- 3b. 仓库内全部 .user.js 行尾普查 ----
   ● 海底小纵队·探矿鲸娘.user.js                                 bytes= 639440 CRLF= 8965 裸LF=    0  发布件（必须 CRLF）

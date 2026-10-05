@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
-"""验证 git 仓库内的 .user.js 仍是逐字节 CRLF：对象层 + git archive 导出层"""
-import hashlib, io, os, subprocess, zipfile
+"""验证 git 仓库内的 .user.js 仍是逐字节 CRLF：对象层 + git archive 导出层
 
-REPO = r"C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42\repo\haiyu-zongdui-tankuangjingniang"
+可复现性（0.4.12 修订）：路径全部由脚本自身位置推导，不再引用临时工作区。
+产出落在仓库内 docs/reports/，随仓库一起版本化。
+临时导出包用 tempfile 建在系统临时目录，跑完即清，不污染仓库也不依赖工作区。
+"""
+import hashlib, io, os, subprocess, tempfile, zipfile
+
+# 本文件位于 <repo>/docs/tools/release/_gitverify.py ⇒ 上溯 4 级才是仓库根
+_HERE = os.path.abspath(__file__)
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(_HERE))))
 NAME = "海底小纵队·探矿鲸娘.user.js"
-OUT = r"C:\Users\D_A\WorkBuddy\2026-10-05-23-01-21\_gitverify.txt"
-ARCH = r"C:\Users\D_A\WorkBuddy\2026-10-05-23-01-21\_gitarc.zip"
+OUT = os.path.join(REPO, "docs", "reports", "_eolout.txt")
 
 EXPECT = "db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee"
 EXPECT_BYTES = 639440
@@ -47,6 +53,7 @@ w("")
 
 # ---- 3. git archive 导出层（等价于平台"下载 zip"）----
 w("---- 3. git archive 导出层：git archive --format=zip ----")
+ARCH = os.path.join(tempfile.gettempdir(), "haiyu-gitarc-verify.zip")
 if os.path.exists(ARCH):
     os.remove(ARCH)
 subprocess.run(["git", "archive", "--format=zip", "-o", ARCH, "HEAD"], cwd=REPO, capture_output=True)
@@ -66,6 +73,10 @@ if os.path.exists(ARCH):
     w("  导出包字节 = " + str(os.path.getsize(ARCH)))
 else:
     w("  [NG] git archive 未产出文件"); fails += 1
+try:
+    os.remove(ARCH)          # 临时导出包跑完即清，不留垃圾
+except OSError:
+    pass
 w("")
 
 # ---- 3b. 仓库内全部 .user.js 的行尾普查 ----

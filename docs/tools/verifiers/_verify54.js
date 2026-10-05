@@ -5,17 +5,30 @@
  *   ① 旧逻辑在同一输入上确实给错答案（本次=20 不归零）
  *   ② 新逻辑在同一输入上给出正确答案（本次=0）
  *
- * 用法：node _verify54.js
- * 产出：_v54out.txt（同目录）
+ * 用法：node docs/tools/verifiers/_verify54.js
+ * 产出：docs/reports/_v54out.txt
+ *
+ * 可复现性（0.4.12 修订）：所有路径由 __dirname 推导，不再依赖工作区散件；
+ * 对照基线锁定仓库内权威快照 docs/versions/v0.4.11.user.js 并以 SHA256 钉死，
+ * 防止「随手拿一个旧文件当基线」这种静默失效。
  */
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const crypto = require("crypto");
 
-const DIR = "C:\\Users\\D_A\\WorkBuddy\\2026-10-05-13-53-42";
-const NEWF = path.join(DIR, "repo\\haiyu-zongdui-tankuangjingniang\\海底小纵队·探矿鲸娘.user.js");
-const OLDF = path.join(DIR, "_bak_0411.user.js");
-const OUT = path.join(DIR, "_v54out.txt");
+const REPO = path.resolve(__dirname, "..", "..", "..");
+const NEWF = path.join(REPO, "海底小纵队·探矿鲸娘.user.js");
+const OUT = path.join(REPO, "docs", "reports", "_v54out.txt");
+
+// 对照基线（0.4.11）：优先仓库内权威快照，兼容历史工作区备份
+const BASE_CANDIDATES = [
+  path.join(REPO, "docs", "versions", "v0.4.11.user.js"),
+  path.resolve(REPO, "..", "_bak_0411.user.js"),
+];
+const BASE_SHA = "9c290a8346fce5e7bf158111a21f834b4ac6142ed8f83f0cef47bf4fbbf81a97";
+const OLDF = BASE_CANDIDATES.find(function (p) { return fs.existsSync(p); }) || BASE_CANDIDATES[0];
+const sha256 = function (b) { return crypto.createHash("sha256").update(b).digest("hex"); };
 
 const L = [];
 const w = (s) => L.push(String(s));
@@ -54,6 +67,8 @@ const oldSrc = oldBuf.toString("utf8");
 
 w("=========== 0.4.12 验收 ===========");
 w("文件 " + NEWF);
+w("基线 " + path.relative(REPO, OLDF).replace(/\\/g, "/") + "  （候选命中 = "
+  + BASE_CANDIDATES.findIndex(function (p) { return p === OLDF; }) + "）");
 w("");
 
 // ── 1. 语法可解析 ─────────────────────────────────────────────
@@ -66,8 +81,10 @@ try {
   fails++;
 }
 // 旧文件同法解析（对照基线可读）
-try { new vm.Script(oldSrc); w("  [OK] 对照基线 _bak_0411 亦可解析"); }
+try { new vm.Script(oldSrc); w("  [OK] 对照基线（0.4.11）亦可解析"); }
 catch (e) { w("  [NG] 备份解析失败：" + e.message); fails++; }
+// 基线身份钉死：必须等于版本链记录的 v0.4.11 哈希，否则对照无意义
+ck("对照基线 SHA256 = v0.4.11 官方值", sha256(oldBuf), BASE_SHA);
 
 // ── 2. 行尾逐字节 ─────────────────────────────────────────────
 w("");
@@ -86,6 +103,7 @@ ck("现行版 字节 = 639440", buf.length, 639440);
 const e0 = eol(oldBuf);
 w("  基线   bytes=" + oldBuf.length + "  CRLF=" + e0.crlf + "  裸LF=" + e0.lf);
 ck("基线   裸 LF = 0", e0.lf, 0);
+ck("基线   字节 = 640151（v0.4.11 官方值）", oldBuf.length, 640151);
 
 // ── 3. CSS 装配真实求值 ───────────────────────────────────────
 w("");
