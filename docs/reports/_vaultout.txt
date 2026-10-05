@@ -1,10 +1,8 @@
 === 工作区现状 ===
   C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42
       [D] .workbuddy  （内含 1 个文件）
-      [D] repo  （内含 529 个文件）
+      [D] repo  （内含 547 个文件）
   C:\Users\D_A\WorkBuddy\2026-10-05-23-01-21
-      [F]      3084  _commitmsg4.txt
-          !! 残留未清理的临时散件
 
 === 关键资产 ===
   [OK] 海底小纵队·探矿鲸娘.user.js  639440 字节
@@ -19,9 +17,9 @@
   [OK] releases/SHA256SUMS.txt  1776 字节
 
 === 台账自洽 ===
-  ledger entries = 68（去重后 46 个不同文件名）
-  journal deleted = 46
+  ledger entries = 70（去重后 47 个不同文件名）
+  journal deleted = 47
   [OK] 归档去重名单与删除名单数量一致，台账自洽
 
 ======================================================
-结论：存在问题 fail=1
+结论：两处工作区已清空，资产齐全，台账自洽（fail=0）

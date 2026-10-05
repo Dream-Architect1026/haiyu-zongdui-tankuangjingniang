@@ -76,6 +76,6 @@ docs/
 ## 归档说明
 
 - 整理过程中清理的开发垃圾（一次性探针、中间输出、4 个浏览器临时 profile）已先整体压缩留底为 `../archive/_junk-removed-2026-10-05.zip`（约 5.3 MB）再永久删除；完整被删清单见 `_pack2_manifest.json`。
-- 0.4.12 收尾轮的清理走 `housekeeping/_housekeeping.py`，按六条硬规则执行留底 + 清理：留底包 `archive/_junk-<时间戳>.zip`（带唯一后缀、永不覆盖），逐项台账 `archive/ledger.json`（名字 / 字节 / sha256）与删除记账 `archive/journal.json`。
-- 两次清理共归档 **46** 个散件；`_zipcov.txt` 证明每一条都躺在归档包里且字节未变，`_vaultout.txt` 证明两处工作区确已清空且关键资产齐全。
+- 0.4.12 收尾轮的清理走 `housekeeping/_housekeeping.py`，按**七条硬规则**执行留底 + 清理：留底包 `archive/_junk-<时间戳>.zip`（带唯一后缀、永不覆盖），逐项台账 `archive/ledger.json`（名字 / 字节 / sha256）与删除记账 `archive/journal.json`。规则表对应三次真实事故，见 `tools/housekeeping/README.md`。
+- 两轮清理共归档并删除 **47** 个散件；`_zipcov.txt` 证明每一条都躺在归档包里且字节未变，`_vaultout.txt` 证明两处工作区确已清空且关键资产齐全。
 - 本仓库 `docs/` 是这些材料的**对外镜像**（保留原始文件名，便于与开发纪要中的引用一一对应）。
