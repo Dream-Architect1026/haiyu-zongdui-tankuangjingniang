@@ -33,7 +33,9 @@ KEY_ASSETS = [
     "docs/reports/_v54out.txt",
     "docs/reports/_eolout.txt",
     "docs/reports/_zipcov.txt",
+    "docs/reports/_sumsout.txt",
     "docs/tools/release/_gitverify.py",
+    "docs/tools/release/_verify_sums.py",
     "docs/tools/housekeeping/_housekeeping.py",
     "releases/SHA256SUMS.txt",
 ]

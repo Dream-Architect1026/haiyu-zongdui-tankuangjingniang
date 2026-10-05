@@ -1,0 +1,25 @@
+================ SHA256SUMS 核对 ================
+清单 = C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42\repo\haiyu-zongdui-tankuangjingniang\releases\SHA256SUMS.txt
+仓库根 = C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42\repo\haiyu-zongdui-tankuangjingniang
+条目数 = 12
+
+---- 逐项核对 ----
+  [OK]  docs/versions/v0.4.3.user.js                   112cb785b86a2862…  bytes=568934 CRLF=8019 裸LF=0
+  [OK]  docs/versions/v0.4.4.user.js                   7003c0bc7e7a24dd…  bytes=591109 CRLF=8286 裸LF=0
+  [OK]  docs/versions/v0.4.5.user.js                   a7a17912e909ea7a…  bytes=597742 CRLF=8325 裸LF=0
+  [OK]  docs/versions/v0.4.6.user.js                   89217fbc992be520…  bytes=606483 CRLF=8447 裸LF=0
+  [OK]  docs/versions/v0.4.7.user.js                   d242770d79811730…  bytes=612048 CRLF=8529 裸LF=0
+  [OK]  docs/versions/v0.4.8.user.js                   e506fb0d9a7dccb7…  bytes=619622 CRLF=8674 裸LF=0
+  [OK]  docs/versions/v0.4.9.user.js                   691a45bb36032580…  bytes=630656 CRLF=8842 裸LF=0
+  [OK]  docs/versions/v0.4.10.user.js                  8d6e2ef2015f7302…  bytes=639645 CRLF=8979 裸LF=0
+  [OK]  docs/versions/v0.4.11.user.js                  9c290a8346fce5e7…  bytes=640151 CRLF=8982 裸LF=0
+  [OK]  海底小纵队·探矿鲸娘.user.js                             db08cb4244cfc7d1…  bytes=639440 CRLF=8965 裸LF=0
+  [OK]  releases/haiyu-zongdui-tankuangjingniang-0.4.0.zip 03b9da99b8e07a28…
+  [OK]  releases/haiyu-zongdui-tankuangjingniang-0.4.12.zip 3dbc6a91c41815ca…
+
+---- 统计 ----
+  核对条目 = 12（其中 .user.js = 10）
+  失败项   = 0
+
+================================================
+结论：全部一致（fail=0）

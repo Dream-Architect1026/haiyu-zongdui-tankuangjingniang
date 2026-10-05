@@ -128,7 +128,22 @@ node --check "海底小纵队·探矿鲸娘.user.js"
 
 # 跑某一轮验收（以 0.4.12 为例）
 node docs/tools/verifiers/_verify54.js
+
+# 全量哈希核对（12 项：9 个历史快照 + 现行版 + 2 个发布包）
+python docs/tools/release/_verify_sums.py
+
+# 版本库层行尾保证（工作区 / git 对象 / git archive 导出 三处一致）
+python docs/tools/release/_gitverify.py
 ```
+
+`releases/SHA256SUMS.txt` 里的路径**相对于仓库根**，所以也能直接用系统工具核对：
+
+```bash
+# git bash（在仓库根执行）
+sha256sum -c releases/SHA256SUMS.txt
+```
+
+> `_verify_sums.py` 除了比对哈希，还会打印每个 `.user.js` 的**字节数与裸 LF 数**。原因是字节数漂移几乎总意味着行尾被改：CRLF→LF 会让文件正好瘦到「行数」个字节，而哈希对不上时单看数字不容易一眼看出是这个原因。两道判据一起给，定位更快。
 
 补丁脚本均支持**干跑**（`--dry`）：只校验锚点唯一性与结构不变量、打印每处版本号上下文，**断言失败即中止且不落盘**。真实写入前一律先干跑，再备份现行版，最后写入并复跑验收。
 

@@ -1,2 +1,27 @@
-03b9da99b8e07a28d180ba6769501a83215aa1dd88ada470fb04f316c761915d  haiyu-zongdui-tankuangjingniang-0.4.0.zip
-3dbc6a91c41815ca7ab77f65d1cad5ecd1b66a65e49a4a74835e9ac4eed61cac  haiyu-zongdui-tankuangjingniang-0.4.12.zip
+# SHA-256 校验清单 —— haiyu-zongdui-tankuangjingniang
+#
+# 路径相对于仓库根。核对方式：
+#   git bash      : sha256sum -c releases/SHA256SUMS.txt
+#   PowerShell    : Get-FileHash 逐项比对（见下）
+#   Python 一站式 : python docs/tools/release/_verify_sums.py
+# 详细说明见 docs/VERIFICATION.md「五、复现方式」。
+#
+# 全部文件行尾为 CRLF、裸 LF 为 0（校验字节数即可发现行尾被改动）。
+
+# ---- 历史版本快照（docs/versions/） ----
+112cb785b86a28624ec707978a8b4e6c41604f07062a4a6c9f8528c3ae02ed9c  docs/versions/v0.4.3.user.js
+7003c0bc7e7a24ddcaf52ef84c25acebc8a2d0217677b4e2cdbbd5fa13b53ac4  docs/versions/v0.4.4.user.js
+a7a17912e909ea7a21fa2b3c4d18c08a815c7f78888e4f964aa62524fab0435e  docs/versions/v0.4.5.user.js
+89217fbc992be5208e2329a893a3a9b3959883f26df4eed7f9fdd5d957d06678  docs/versions/v0.4.6.user.js
+d242770d798117303d6005687e7e5448dcd447f93eeb2307c93bf6f4b7fec359  docs/versions/v0.4.7.user.js
+e506fb0d9a7dccb7346d7ead31024d4092cf42c342486d42c1b8c32725bb1090  docs/versions/v0.4.8.user.js
+691a45bb36032580c0838c1b154725ef23f8f0c5b2ee8df4da9afc0b83955862  docs/versions/v0.4.9.user.js
+8d6e2ef2015f73020807e8246251fd0d39ad04d8a3ac0db5cb6d391ba9cc8d9b  docs/versions/v0.4.10.user.js
+9c290a8346fce5e7bf158111a21f834b4ac6142ed8f83f0cef47bf4fbbf81a97  docs/versions/v0.4.11.user.js
+
+# ---- 现行版（仓库根） ----
+db08cb4244cfc7d14762f20f932d47d380eb3a4fdc80b42429fcc263b56098ee  海底小纵队·探矿鲸娘.user.js
+
+# ---- 发布包（releases/） ----
+03b9da99b8e07a28d180ba6769501a83215aa1dd88ada470fb04f316c761915d  releases/haiyu-zongdui-tankuangjingniang-0.4.0.zip
+3dbc6a91c41815ca7ab77f65d1cad5ecd1b66a65e49a4a74835e9ac4eed61cac  releases/haiyu-zongdui-tankuangjingniang-0.4.12.zip
