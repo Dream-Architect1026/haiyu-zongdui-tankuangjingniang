@@ -11,10 +11,12 @@
   _junk-20261005-234808.zip  2498 字节  3 条目
   _junk-20261005-235751.zip  1981 字节  1 条目
   _junk-20261005-235753.zip  1981 字节  1 条目
+  _junk-20261006-000008.zip  819 字节  1 条目
+  _junk-20261006-000010.zip  819 字节  1 条目
   _junk-removed-2026-10-05.zip  5522967 字节  2041 条目
   _junk-round4-2026-10-05.zip  107146 字节  41 条目
 
-=== 覆盖与哈希核对（ledger 47 条）===
+=== 覆盖与哈希核对（ledger 48 条）===
   [OK] _cnt2.txt                sha256=5af978fe1ddc3078  在 _junk-20261005-234327.zip
   [OK] _commitmsg.txt           sha256=056cd953dc54050c  在 _junk-20261005-234327.zip
   [OK] _commitmsg2.txt          sha256=7882de26665fa745  在 _junk-20261005-234327.zip
@@ -59,6 +61,7 @@
   [OK] _vault.py                sha256=f3ba50f52d217241  在 _junk-20261005-234657.zip
   [OK] _vault.txt               sha256=e6edf22e8fcddc2d  在 _junk-20261005-234657.zip
   [OK] _vault_run.txt           sha256=19eaf43821a7660e  在 _junk-20261005-234657.zip
+  [OK] _zipchk.txt              sha256=cde7c638199f4b73  在 _junk-20261006-000008.zip
   [OK] _zipcov.py               sha256=d0da8b63857e0e20  在 _junk-20261005-234657.zip
   [OK] _zipcov.txt              sha256=1ab27176de0e24b5  在 _junk-20261005-234657.zip
   [OK] _zipcov_run.txt          sha256=19eaf43821a7660e  在 _junk-20261005-234657.zip

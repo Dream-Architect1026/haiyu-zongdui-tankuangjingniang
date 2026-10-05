@@ -1,7 +1,7 @@
 === 工作区现状 ===
   C:\Users\D_A\WorkBuddy\2026-10-05-13-53-42
       [D] .workbuddy  （内含 1 个文件）
-      [D] repo  （内含 547 个文件）
+      [D] repo  （内含 561 个文件）
   C:\Users\D_A\WorkBuddy\2026-10-05-23-01-21
 
 === 关键资产 ===
@@ -9,7 +9,7 @@
   [OK] docs/versions/v0.4.11.user.js  640151 字节
   [OK] docs/reports/_v54out.txt  4858 字节
   [OK] docs/reports/_eolout.txt  5141 字节
-  [OK] docs/reports/_zipcov.txt  4963 字节
+  [OK] docs/reports/_zipcov.txt  5345 字节
   [OK] docs/reports/_sumsout.txt  1710 字节
   [OK] docs/tools/release/_gitverify.py  5650 字节
   [OK] docs/tools/release/_verify_sums.py  3683 字节
@@ -17,8 +17,8 @@
   [OK] releases/SHA256SUMS.txt  1776 字节
 
 === 台账自洽 ===
-  ledger entries = 70（去重后 47 个不同文件名）
-  journal deleted = 47
+  ledger entries = 72（去重后 48 个不同文件名）
+  journal deleted = 48
   [OK] 归档去重名单与删除名单数量一致，台账自洽
 
 ======================================================
