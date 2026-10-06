@@ -17,7 +17,9 @@
 
 ---
 
-视频介绍：https://v.douyin.com/yT--Bm7V7R0/ j@P.kP 06/11 fbn:/ :2pm 
+**D-Whaler用户群（QQ）：1128950753**
+[![D-Whaler用户群](https://qm.qq.com/q/X0lycPF1yq)]
+[![抖音视频](https://v.douyin.com/yT--Bm7V7R0/ j@P.kP 06/11 fbn:/ :2pm )]
 
 ---
 
