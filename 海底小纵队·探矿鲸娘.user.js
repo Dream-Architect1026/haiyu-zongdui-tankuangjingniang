@@ -1372,7 +1372,7 @@
         },
         platformParams: {
           cx: {
-            name: "海底小纵队·探矿鲸娘",
+            name: "海底小纵队 · D-Whaler",
             parts: [
               {
                 name: "任务",
