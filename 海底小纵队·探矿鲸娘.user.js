@@ -1,8 +1,8 @@
 // ==UserScript==
 
-// @name         海底小纵队 · 探矿鲸娘
+// @name         海底小纵队 · D-Whaler
 // @namespace    xinghong
-// @version      0.4.12
+// @version      0.5.1
 // @author       X.H
 // @description  海底小纵队·探矿鲸娘：超星学习通自动刷课与 AI 答题助手，DeepSeek Flash 驱动智能答题，视频倍速、文档图书自动完成、字体解密，简洁高效。
 // @license      MIT
@@ -1326,6 +1326,20 @@
     _GM_setValue(LEGACY_CONFIG_STORAGE_KEY, serializedConfig);
     setLocalStorageConfig(serializedConfig);
   };
+  /* 「其他」卡片已从界面移除（PRD v0.4.13）：不展示、不可改，但功能还在后台跑
+     ⇒ 三个参数的取值在这里写死。判定"下标会不会错位"必须逐个核对，不能只看名字：
+       params[0]=操作间隔（散落十几处 sleep 调用）、params[1]=正确阈值、params[2]=相似阈值。
+     所以只从渲染层滤掉，数据一个字节都不动。 */
+  const HX_HIDDEN_OTHER_PARAMS = { "操作间隔": 3, "正确阈值": 85, "相似阈值": 85 };
+  const hxLockOtherParams = (config2) => {
+    const list = config2 && config2.otherParams && config2.otherParams.params;
+    if (!Array.isArray(list)) return;
+    list.forEach((param) => {
+      if (param && Object.prototype.hasOwnProperty.call(HX_HIDDEN_OTHER_PARAMS, param.name)) {
+        param.value = HX_HIDDEN_OTHER_PARAMS[param.name];
+      }
+    });
+  };
   const DEFAULT_AI_MODEL = "deepseek-flash";
   const ALLOWED_AI_MODELS = ["deepseek-flash", "deepseek-v4-pro"];
   const sanitizeAiConfig = (store) => {
@@ -1397,6 +1411,7 @@
         }
       }
       sanitizeAiConfig(globalConfig);
+      hxLockOtherParams(globalConfig);
       persistConfig(globalConfig);
       return globalConfig;
     },
@@ -1467,6 +1482,9 @@
     "5. 简答题、名词解释：answer 仅含一个元素，为完整、准确、简洁的参考答案。",
     "选择题必须原样照抄选项正文，不要输出字母标号、不要改写或省略。务必保证答案准确。"
   ].join("\n");
+  /* v0.5.1：AI 一遍答不出来就重问，最多问这么多遍；连续失败即跳过该题。
+     后台被动运行，不占任何配置项，只在状态页留通知。 */
+  const HX_ASK_MAX_TRIES = 3;
   const buildAIUserPrompt = (question) => {
     const typeName = AI_TYPE_NAME[question.type] || "题目";
     const stem = (question.searchText == null ? void 0 : question.searchText.stem) ?? question.title;
@@ -1531,7 +1549,7 @@
     requests: 0, ok: 0, failed: 0,
     promptTokens: 0, completionTokens: 0,
     cacheHitTokens: 0, cacheMissTokens: 0, totalTokens: 0,
-    elapsedMs: 0, cost: 0
+    elapsedMs: 0, cost: 0, uptimeMs: 0
   });
   (() => {
     const stored = readUsageStats();
@@ -1590,13 +1608,15 @@
     if (v < 1e6) return (v / 1e4).toFixed(1) + "\u4e07";
     return (v / 1e6).toFixed(2) + "M";
   };
-  const formatCost = (value) => {
-    const v = Number(value) || 0;
-    if (v <= 0) return "\u00a50";
-    if (v < 0.01) return "\u00a5" + v.toFixed(4);
-    return "\u00a5" + v.toFixed(2);
+  /* 花费精度（PRD v0.4.13）：主显示固定两位小数，备注/悬浮提示传 digits=4 显示四位小数。
+     旧版按金额大小在 2 位与 4 位之间自动切换，导致同一格在不同花费下精度不一致。
+     digits=0 也支持（toFixed 语义），非法值一律回落到 2 位。 */
+  const formatCost = (value, digits) => {
+    const v = Math.max(Number(value) || 0, 0);
+    const n = Number(digits);
+    return "\u00a5" + v.toFixed(isFinite(n) && n >= 0 ? n : 2);
   };
-  const HX_BUILD = "0.4.12";
+  const HX_BUILD = "0.5.1";
   const HX_DEFAULT_PET = "小鲸娘";
   const HX_RUN_ID = "hx" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   let hxShadow = null;
@@ -1624,13 +1644,48 @@
     try { usageTick.value += 1; } catch (error) {}
     return sessionUsage();
   };
+  /* 运行时长格式化：累计值可能跨很多天，所以补上「天」这一档 */
   const formatUptime = (ms) => {
-    const total = Math.floor(ms / 1000);
+    const total = Math.floor(Math.max(Number(ms) || 0, 0) / 1000);
     if (total < 60) return total + " \u79d2";
     const mins = Math.floor(total / 60);
     if (mins < 60) return mins + " \u5206\u949f";
     const hours = Math.floor(mins / 60);
-    return hours + " \u5c0f\u65f6 " + (mins % 60) + " \u5206";
+    if (hours < 24) return hours + " \u5c0f\u65f6 " + (mins % 60) + " \u5206";
+    return Math.floor(hours / 24) + " \u5929 " + (hours % 24) + " \u5c0f\u65f6";
+  };
+  /* ── 运行总时长（跨刷新累计）─────────────────────────────────────
+     PRD：新增「运行总时长」统计，展示在运行时长备注中。
+     与「本次」用量同界思路相反：这里要的是"装好脚本以后一共跑了多久"，
+     所以随用量统计一起持久化（hx_usage_stats_v1.uptimeMs）。
+     每 60s 落一次盘，页面隐藏 / 关闭时补落一次，刷新不丢。
+     刻意忽略 >60s 的空档：机器休眠 / 断电期间不算运行时间。 */
+  let hxUptimeLastAt = Date.now();
+  let hxUptimeSavedAt = Date.now();
+  const hxUptimeTick = () => {
+    const now = Date.now();
+    const delta = now - hxUptimeLastAt;
+    hxUptimeLastAt = now;
+    if (delta > 0 && delta < 6e4)
+      usageStore.uptimeMs += delta;
+    if (now - hxUptimeSavedAt >= 6e4) {
+      hxUptimeSavedAt = now;
+      persistUsageStats();
+    }
+    return usageStore.uptimeMs;
+  };
+  const bindUptimeMeter = () => {
+    setInterval(() => { try { hxUptimeTick(); } catch (error) { /* 忽略 */ } }, 1e3);
+    try {
+      window.addEventListener("pagehide", () => { try { persistUsageStats(); } catch (error) { /* 忽略 */ } });
+      document.addEventListener("visibilitychange", () => {
+        try {
+          hxUptimeTick();
+          if (document.visibilityState === "hidden") persistUsageStats();
+        } catch (error) { /* 忽略 */ }
+      });
+    } catch (error) { /* 忽略 */ }
+    return true;
   };
   const buildUsageBarHtml = (store, peak) => {
     const sess = sessionUsage();
@@ -1643,13 +1698,13 @@
       favName = favTier.name;
     } catch (error) { /* 忽略：极早期渲染时好感度表可能尚未就绪，下一拍会自愈 */ }
     const sessTitle = "本次启用脚本后：请求 " + sess.requests + " 次 · " + formatTokenCount(sess.totalTokens)
-      + " token · " + formatCost(sess.cost) + " ｜ 点这一格归零";
-    const favTitle = "好感度 Lv." + favLv + " · " + favName + " ｜ 累计花费 " + formatCost(store.cost)
+      + " token · " + formatCost(sess.cost, 4) + " ｜ 点这一格归零";
+    const favTitle = "好感度 Lv." + favLv + " · " + favName + " ｜ 累计花费 " + formatCost(store.cost, 4)
       + (peak ? " ｜ 当前高峰时段" : " ｜ 当前空闲时段");
     const cells = [
       ["本次", String(sess.requests), sessTitle, ' data-hx-cell="session"'],
       ["Token", formatTokenCount(store.totalTokens), "脚本统计的累计 token 用量", ""],
-      ["总花费", formatCost(store.cost), "脚本统计的累计花费", ""]
+      ["总花费", formatCost(store.cost), "脚本统计的累计花费 ｜ 精确值 " + formatCost(store.cost, 4), ""]
     ].map(([label, value, tip, attr]) => '<div class="usage-cell"' + attr + ' title="' + tip + '"><span class="usage-cell__k">' + label
       + '</span><span class="usage-cell__v">' + value + "</span></div>").join("");
     return '<div class="usage-main">' + cells + "</div>"
@@ -1658,7 +1713,8 @@
       + '<span class="usage-fav__k">好感度</span>'
       + '<span class="usage-fav__v">Lv.' + favLv + " · " + favName + "</span>"
       + "</span>"
-      + '<span class="usage-uptime" title="本次启用脚本后的运行时长">运行 ' + formatUptime(upMs) + "</span>"
+      + '<span class="usage-uptime" title="本次启用脚本后 ' + formatUptime(upMs) + " ｜ 运行总时长 " + formatUptime(store.uptimeMs) + '">运行 '
+      + formatUptime(upMs) + "</span>"
       + "</div>";
   };
 
@@ -1918,7 +1974,6 @@
   });
   const _hoisted_1$4 = { class: "setting" };
   const _hoisted_2$4 = { class: "setting-section-title" };
-  const _hoisted_3$2 = { class: "setting-section-title" };
   const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "index",
     props: {
@@ -1947,6 +2002,8 @@
                 vue.createVNode(_component_el_input, {
                   modelValue: _ctx.globalConfig.ai.deepseek.apiKey,
                   "onUpdate:modelValue": (v) => _ctx.globalConfig.ai.deepseek.apiKey = v,
+                  type: "password",
+                  "show-password": true,
                   placeholder: "DeepSeek API Key",
                   clearable: true,
                   size: "small"
@@ -2032,62 +2089,15 @@
                 ], 64);
               }), 128))
             ]);
-          }), 128)),
-          vue.createElementVNode("div", null, [
-            vue.createVNode(_component_el_divider, { "border-style": "dashed" }, {
-              default: vue.withCtx(() => [
-                vue.createElementVNode("span", _hoisted_3$2, vue.toDisplayString(_ctx.globalConfig.otherParams.name), 1)
-              ]),
-              _: 1
-            }),
-            (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(_ctx.globalConfig.otherParams.params, (item) => {
-              return vue.openBlock(), vue.createElementBlock(vue.Fragment, {
-                key: item.name
-              }, [
-                item.type === "boolean" ? (vue.openBlock(), vue.createBlock(_component_el_form_item, {
-                  key: 0,
-                  class: "setting-switch",
-                  label: item.name
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createVNode(_component_el_switch, {
-                      modelValue: item.value,
-                      "onUpdate:modelValue": ($event) => item.value = $event,
-                      size: "small"
-                    }, null, 8, ["modelValue", "onUpdate:modelValue"])
-                  ]),
-                  _: 2
-                }, 1032, ["label"])) : (vue.openBlock(), vue.createBlock(_component_el_form_item, {
-                  key: 1,
-                  class: "setting-number",
-                  label: item.name,
-                  required: "",
-                  size: "small"
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createVNode(_component_el_input_number, {
-                      modelValue: item.value,
-                      "onUpdate:modelValue": ($event) => item.value = $event,
-                      min: item.min ?? 3,
-                      max: item.max ?? 100,
-                      step: item.step ?? 1,
-                      size: "small"
-                    }, null, 8, ["modelValue", "onUpdate:modelValue", "min", "max", "step"])
-                  ]),
-                  _: 2
-                }, 1032, ["label"]))
-              ], 64);
-            }), 128))
-          ])
+          }), 128))
         ]);
       };
     }
   });
   const _hoisted_1$3 = { class: "question_table" };
-  const _hoisted_2$3 = /* @__PURE__ */ vue.createStaticVNode('<div class="answer-legend" aria-label="答案状态说明"><span class="answer-result--success">已答</span><span class="answer-result--searching">查询</span><span class="answer-result--pending">等待</span><span class="answer-result--error">失败</span></div>', 1);
+  const _hoisted_2$3 = /* @__PURE__ */ vue.createStaticVNode('<div class="answer-legend" aria-label="答案状态说明"><span class="answer-result--success">已答</span><span class="answer-result--searching">查询</span><span class="answer-result--error">失败</span></div>', 1);
   const _hoisted_3$1 = ["innerHTML"];
   const _hoisted_4$2 = { key: 0 };
-  const _hoisted_5 = { key: 1 };
   const _hoisted_6 = ["innerHTML"];
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "QuestionTable",
@@ -2099,7 +2109,13 @@
         var _a;
         return ((_a = question.searchText) == null ? void 0 : _a.stem) || question.title;
       };
-      const getAnswerStatus = (question) => question.answerStatus ?? (question.answer.length ? "success" : "pending");
+      /* 作答状态（v0.5.1 收口为三种）：已答 success / 查询 searching / 失败 error。
+         原「等待 pending」已并入「查询」——题目在排队与正在查询，对主人是同一件事，
+         所以只在唯一收口点做归一；历史遗留的 answerStatus = "pending" 也一并归入。 */
+      const getAnswerStatus = (question) => {
+        const status = question.answerStatus ?? (question.answer.length ? "success" : "searching");
+        return status === "pending" ? "searching" : status;
+      };
       return (_ctx, _cache) => {
         const ElTable = vue.resolveComponent("el-table");
         const ElTableColumn = vue.resolveComponent("el-table-column");
@@ -2132,8 +2148,8 @@
                   vue.createElementVNode("div", {
                     class: vue.normalizeClass(["answer-result", `answer-result--${getAnswerStatus(row)}`])
                   }, [
-                    getAnswerStatus(row) === "pending" ? (vue.openBlock(), vue.createElementBlock("span", _hoisted_4$2, "等待")) : getAnswerStatus(row) === "searching" ? (vue.openBlock(), vue.createElementBlock("span", _hoisted_5, "查询")) : (vue.openBlock(), vue.createElementBlock("div", {
-                      key: 2,
+                    getAnswerStatus(row) === "searching" ? (vue.openBlock(), vue.createElementBlock("span", _hoisted_4$2, "查询")) : (vue.openBlock(), vue.createElementBlock("div", {
+                      key: 1,
                       innerHTML: row.answer.join()
                     }, null, 8, _hoisted_6))
                   ], 2)
@@ -2158,10 +2174,10 @@
   const _sfc_main$5 = {};
   const _hoisted_1$2 = {
     class: "guide-page",
-    "aria-label": "使用教程",
+    "aria-label": "引导",
     tabindex: "0"
   };
-  const _hoisted_2$2 = /* @__PURE__ */ vue.createStaticVNode('<header class="guide-header"><div class="guide-heading-row"><h2 class="guide-title">使用教程</h2><span class="guide-tag">AI 答题</span></div><p class="guide-subtitle">选择云端 DeepSeek，填入 API Key 后即可自动答题。</p></header><ol class="guide-list"><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">01</span><h3 class="guide-card-title">选择 AI 服务来源</h3></div><p class="guide-copy">在「答题」页面顶部选择<strong>云端 DeepSeek</strong>，效果稳定，只需一个 API Key。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">02</span><h3 class="guide-card-title">云端：填写 DeepSeek Key</h3></div><p class="guide-copy">前往 platform.deepseek.com 注册并创建 sk- 开头的 API Key，填入后模型已默认选中 <strong>Flash</strong>，无需修改，刷新页面即可自动答题。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">03</span><h3 class="guide-card-title">提高准确率</h3></div><p class="guide-copy">遇到不确定的题目，可切换模型后重试；连续多题失败时先手动做一题，脚本会参考历史答案。题目若含图片或公式，尽量保持选项文字完整，有助于判定。</p></li></ol>', 2);
+  const _hoisted_2$2 = /* @__PURE__ */ vue.createStaticVNode('<header class="guide-header"><div class="guide-heading-row"><h2 class="guide-title">引导</h2><span class="guide-tag">AI 答题</span></div><p class="guide-subtitle">填入 DeepSeek API Key 后，脚本就会自动答题。</p></header><ol class="guide-list"><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">01</span><h3 class="guide-card-title">填写 DeepSeek API Key</h3></div><p class="guide-copy">前往 platform.deepseek.com 注册并创建 sk- 开头的 API Key，粘贴到本面板「配置」页的 API Key 一栏即可。模型已默认选中 <strong>Flash</strong>，无需修改；刷新页面后脚本自动开始答题。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">02</span><h3 class="guide-card-title">提高准确率</h3></div><p class="guide-copy">遇到不确定的题目，可切换模型后重试；连续多题失败时先手动做一题，脚本会参考历史答案。题目若含图片或公式，尽量保持选项文字完整，有助于判定。</p></li></ol>', 2);
   const DONATE_IMG_SRC = decryptDonateImage();
   const DONATE_CARD_HTML = '<h3 style="margin:0 0 7px;font-size:13px">赞助开发 · 随缘打赏</h3><p style="margin:0 0 9px;font-size:11px;line-height:1.85;text-align:left">如果脚本帮到了你，欢迎扫码请作者喝杯奶茶～<br>· 单人打赏<strong>上限 1.88 元</strong>，不设下限，心意到即可；<br>· <strong>矿大北京的学弟学妹们不要白嫖哦</strong>。</p><img src="' + DONATE_IMG_SRC + '" alt="支付宝赞助码" style="width:236px;display:block;margin:0 auto"><p style="margin:9px 0 0;text-align:center;font-size:11px">打开支付宝「扫一扫」</p>';
   const _hoisted_donate9 = /* @__PURE__ */ vue.createVNode("section", {
@@ -2184,10 +2200,10 @@
   const _sfc_main$9 = {};
   const _hoisted_1$9 = {
     class: "guide-page",
-    "aria-label": "使用协议",
+    "aria-label": "使用须知",
     tabindex: "0"
   };
-  const _hoisted_2$9 = /* @__PURE__ */ vue.createStaticVNode('<header class="guide-header"><div class="guide-heading-row"><h2 class="guide-title">使用协议</h2><span class="guide-tag">共 6 项</span></div><p class="guide-subtitle">使用前，请仔细阅读以下声明。</p></header><ol class="guide-list"><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">01</span><h3 class="guide-card-title">学习与研究用途</h3></div><p class="guide-copy">本脚本仅供个人学习与研究使用。请遵守所在学校的教学管理规定、学术诚信要求，以及所用平台的用户协议与服务条款，勿用于代写作业、替考等违规用途。因违反上述规定产生的一切后果，由使用者自行承担。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">02</span><h3 class="guide-card-title">账号安全</h3></div><p class="guide-copy">脚本不会收集、上传或保存你的账号密码。请自行保管好学习通账号，切勿将 API Key 泄露给他人。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">03</span><h3 class="guide-card-title">数据与隐私</h3></div><p class="guide-copy">脚本仅在你主动使用 AI 答题时，向 DeepSeek 接口发送题目与选项文本；不会上传你的学习记录、浏览历史或个人信息。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">04</span><h3 class="guide-card-title">费用与额度</h3></div><p class="guide-copy">AI 答题调用 DeepSeek 官方接口，相关费用由 DeepSeek 平台按你的账户实际用量计费，脚本作者不承担任何费用。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">05</span><h3 class="guide-card-title">风险自担</h3></div><p class="guide-copy">使用脚本可能与相应平台产生冲突，由此产生的一切后果由使用者自行承担。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">06</span><h3 class="guide-card-title">开发者权利</h3></div><p class="guide-copy">本脚本的最终解释权归脚本开发者所有；发现问题可通过项目仓库反馈。</p></li></ol><footer class="guide-footer"><p class="guide-sign">Developed by <strong>X.H</strong></p><p class="guide-meta">海底小纵队 · 探矿鲸娘 · v0.4.12 · MIT License</p></footer>', 3);
+  const _hoisted_2$9 = /* @__PURE__ */ vue.createStaticVNode('<header class="guide-header"><div class="guide-heading-row"><h2 class="guide-title">使用须知</h2><span class="guide-tag">共 6 项</span></div><p class="guide-subtitle">使用前，请仔细阅读以下声明。</p></header><ol class="guide-list"><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">01</span><h3 class="guide-card-title">学习与研究用途</h3></div><p class="guide-copy">本脚本仅供个人学习与研究使用。请遵守所在学校的教学管理规定、学术诚信要求，以及所用平台的用户协议与服务条款，勿用于代写作业、替考等违规用途。因违反上述规定产生的一切后果，由使用者自行承担。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">02</span><h3 class="guide-card-title">账号安全</h3></div><p class="guide-copy">脚本不会收集、上传或保存你的账号密码。请自行保管好学习通账号，切勿将 API Key 泄露给他人。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">03</span><h3 class="guide-card-title">数据与隐私</h3></div><p class="guide-copy">脚本仅在你主动使用 AI 答题时，向 DeepSeek 接口发送题目与选项文本；不会上传你的学习记录、浏览历史或个人信息。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">04</span><h3 class="guide-card-title">费用与额度</h3></div><p class="guide-copy">AI 答题调用 DeepSeek 官方接口，相关费用由 DeepSeek 平台按你的账户实际用量计费，脚本作者不承担任何费用。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">05</span><h3 class="guide-card-title">风险自担</h3></div><p class="guide-copy">使用脚本可能与相应平台产生冲突，由此产生的一切后果由使用者自行承担。</p></li><li class="guide-card"><div class="guide-card-heading"><span class="guide-number" aria-hidden="true">06</span><h3 class="guide-card-title">开发者权利</h3></div><p class="guide-copy">本脚本的最终解释权归脚本开发者所有；发现问题可通过项目仓库反馈。</p></li></ol><footer class="guide-footer"><p class="guide-sign">Developed by <strong>X.H</strong></p><p class="guide-meta">海底小纵队 · 探矿鲸娘 · v0.5.1 · MIT License</p></footer>', 3);
   const _hoisted_3$9 = [
     _hoisted_2$9
   ];
@@ -6718,10 +6734,26 @@
               return 0;
             const question = vue.reactive({ ...parsedQuestion, answerStatus: "searching" });
             this.addQuestion(question);
-            const answerData = await getAnswer(question);
-            if (!isCurrent())
-              return 0;
-            const values = getAnswerValues(answerData, question);
+            /* v0.5.1：AI 一遍答不出来就重问，最多 HX_ASK_MAX_TRIES 遍；
+               连续 HX_ASK_MAX_TRIES 遍都拿不到答案，就跳过本题、继续下一道。
+               全程后台被动运行，不占配置项；每次重问与最终跳过都会在状态页留通知。 */
+            let answerData = null;
+            let values = null;
+            for (let attempt = 1; attempt <= HX_ASK_MAX_TRIES; attempt += 1) {
+              if (!isCurrent())
+                return 0;
+              answerData = await getAnswer(question);
+              if (!isCurrent())
+                return 0;
+              values = getAnswerValues(answerData, question);
+              if (values == null ? void 0 : values.length) {
+                if (attempt > 1)
+                  this.addLog(`第 ${index + 1} 题重问第 ${attempt} 遍，答出来啦～`, "primary");
+                break;
+              }
+              if (attempt < HX_ASK_MAX_TRIES)
+                this.addLog(`第 ${index + 1} 题第 ${attempt} 遍没答出来，鲸娘再问一遍（第 ${attempt + 1}/${HX_ASK_MAX_TRIES} 遍）～`, "warning");
+            }
             if (values == null ? void 0 : values.length) {
               question.answer = values;
               question.answerStatus = "success";
@@ -6729,7 +6761,7 @@
               this.addLog(`第 ${index + 1} 题拿下啦～`, "success");
               this.correctNum += 1;
             } else {
-              this.addLog(`第 ${index + 1} 题绊了一跤… <a class="log-action-link" href="#" data-log-action="show-answer-tab">看看为啥</a>`, "danger");
+              this.addLog(`第 ${index + 1} 题连问 ${HX_ASK_MAX_TRIES} 遍都没答出来，先跳过这题～ <a class="log-action-link" href="#" data-log-action="show-answer-tab">看看为啥</a>`, "warning");
               question.answerStatus = "error";
               question.answer = [((_b = answerData.error) == null ? void 0 : _b.message) || "未查询到答案"];
             }
@@ -7385,7 +7417,7 @@
       const cardWidth = vue.computed(() => configStore.menuIndex === ANSWER_TAB_NAME ? ANSWER_CARD_WIDTH : DEFAULT_CARD_WIDTH);
       (_a = document.querySelector("li>a.experience:not([onclick])")) == null ? void 0 : _a.click();
       logStore.addLog("协议按过爪印啦～", "success");
-      logStore.addLog("面板 0.4.12 已就位，鲸娘开工～", "success");
+      logStore.addLog("面板 0.5.1 已就位，鲸娘开工～", "success");
       logStore.addLog("怪怪的…换个 Edge 浏览器试试？", "warning");
       const urlLogicPairs = [
         { keyword: "/mycourse/studentstudy", logic: useCxChapterLogic },
@@ -7433,12 +7465,12 @@
         },
         {
           name: "3",
-          label: "教程",
+          label: "引导",
           component: Tutorial
         },
         {
           name: "4",
-          label: "协议",
+          label: "须知",
           component: ScriptTip
         }
       ]);
@@ -7680,7 +7712,7 @@
     "lor Emoji\";--el-font-family: var(--app-font-family);z-index:100003;position:fixed;color:#1f2329;font-family:var(--app-font-family)!important;font-size:14px;line-height:1.5715;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}.main-page *,.main-page input,.main-page button,.main-page textarea{font-family:var(--app-font-family)!important;letter-spacing:0}.main-page .el-card,.main-page .el-tabs,.main-page .el-text,.main-page .el-button,.main-page .el-input,.main-page .el-input__inner,.main-page .el-input-number,.main-page .el-table{font-family:var(--app-font-family)!important}.main-page .overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1001}.main-page .el-card{border:0}.main-page .card-header{display:flex;justify-content:space-between;flex-direction:row;align-items:center;margin:0;padding:0;cursor:move}.main-page .card-header ",
     ".title{font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:500}.main-page .warning-icon{margin-left:5px}.main-page .zoom-icon{cursor:pointer}.main-page .zoom-icon.is-spaced{margin-left:8px}.main-page .minus{margin:5px 10px -10px 0}.main-page .compact-divider{margin:0}.main-page .demo-tabs{display:initial}.main-page .el-card__header{background-color:#1f71e0;color:#fff;padding:7px 10px 7px 16px;margin:0}.main-page .el-card__body{padding:0 16px 20px}.main-page .el-tabs__nav-wrap:after{height:1px}.main-page .el-tabs__active-bar{background-color:#176ae5}.main-page .el-tabs__item{font-size:13px;height:34px}.main-page .el-tabs__item.is-top{font-weight:400;color:#4e5969;padding:0 8px 0 12px}.main-page .el-tabs__item.is-active{font-weight:500;color:#176ae5;padding:0 8px 0 12px}.main-page .script-home{padding-top:2px}.main-page .announcement-board{box-sizing:border-bo",
     "x;margin:2px 0 10px;padding:8px 10px;border:1px solid #bae0ff;border-radius:6px;background-color:#e6f4ff}.main-page .announcement-heading{display:flex;align-items:center;gap:6px;margin-bottom:4px;color:#0958d9;font-size:12px;font-weight:600;line-height:20px}.main-page .announcement-heading:before{content:\"\";width:6px;height:6px;flex:0 0 auto;border-radius:50%;background-color:#1677ff}.main-page .announcement-list{display:grid;gap:3px;margin:0;padding:0;list-style:none}.main-page .announcement-item{color:#1f2329;font-size:12px;line-height:20px;word-break:break-word}.main-page .log .el-text{font-weight:400;white-space:normal}.main-page .log-time{font-weight:400}.main-page .log-action-link{color:#176ae5;cursor:pointer;text-decoration:none}.main-page .log-action-link:hover{color:#409eff;text-decoration:underline}.main-page .log-divider{margin:0}.main-page .token-input,.main-page .question-li",
-    "st{font-size:12px}.main-page .token-label{border-radius:0}.main-page .question_table{width:625px}.main-page .answer-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:10px 2px 8px;font-size:11px;line-height:18px}.main-page .answer-legend>span{display:inline-flex;align-items:center;gap:5px}.main-page .answer-legend>span:before{content:\"\";width:6px;height:6px;border-radius:50%;background:currentColor}.main-page .answer-result{line-height:1.7;overflow-wrap:anywhere}.main-page .answer-result--success{color:#15803d}.main-page .answer-result--searching{color:#a15c08}.main-page .answer-result--pending{color:#697586}.main-page .answer-result--error{color:#c73e38}.main-page .setting{margin-top:-8px;font-size:14px}.main-page .setting-section-title{font-size:13px}.main-page .setting-checkbox{margin-bottom:6px}.main-page .setting-number{margin-top:6px}.main-page .setting .el-",
+    "st{font-size:12px}.main-page .token-label{border-radius:0}.main-page .question_table{width:625px}.main-page .answer-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:10px 2px 8px;font-size:11px;line-height:18px}.main-page .answer-legend>span{display:inline-flex;align-items:center;gap:5px}.main-page .answer-legend>span:before{content:\"\";width:6px;height:6px;border-radius:50%;background:currentColor}.main-page .answer-result{line-height:1.7;overflow-wrap:anywhere}.main-page .answer-result--success{color:#15803d}.main-page .answer-result--searching{color:#a15c08}.main-page .answer-result--error{color:#c73e38}.main-page .setting{margin-top:-8px;font-size:14px}.main-page .setting-section-title{font-size:13px}.main-page .setting-checkbox{margin-bottom:6px}.main-page .setting-number{margin-top:6px}.main-page .setting .el-",
     "form-item{margin-bottom:0}\n\n\n.main-page{--hx-bg:URL(data:image/jpeg;base64,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",
@@ -7806,7 +7838,7 @@
     ".main-page .el-input__inner,.main-page .el-textarea__inner,.main-page .el-select__placeholder,\n.main-page .el-select__selected-item{color:var(--hx-ink)!important}\n.main-page .el-input__inner::placeholder,.main-page .el-textarea__inner::placeholder{color:#6d84a3!important}\n.main-page .el-input-number__decrease,.main-page .el-input-number__increase{\nbackground:rgba(56,226,255,.10)!important;color:var(--hx-cyan)!important;border-color:var(--hx-line)!important}\n.main-page .el-input__inner[type=number]{text-align:left!important}\n\n/* ---- 表格 ---- */\n.main-page .el-table{background:transparent!important;color:var(--hx-ink)!important}\n.main-page .el-table tr{background:transparent!important}\n.main-page .el-table th.el-table__cell{background:rgba(56,226,255,.10)!important;color:var(--hx-cyan)!important;\nfont-weight:600;border-bottom:1px solid var(--hx-line)!important}\n.main-page .el-t",
     "able td.el-table__cell{background:transparent!important;border-bottom:1px solid rgba(120,190,255,.10)!important}\n.main-page .el-table__body tr:hover>td.el-table__cell{background:rgba(56,226,255,.07)!important}\n.main-page .el-table__inner-wrapper::before{background-color:var(--hx-line)!important}\n.main-page .el-table__empty-block{background:transparent!important}\n.main-page .el-table__empty-text{color:var(--hx-ink-dim)!important}\n\n/* ---- 按钮 ---- */\n.main-page .el-button{border-radius:8px!important;font-weight:600;letter-spacing:.2px;\nborder:1px solid var(--hx-line)!important;background:rgba(56,226,255,.08)!important;color:var(--hx-ink)!important;\ntransition:all .2s}\n.main-page .el-button:hover{background:rgba(56,226,255,.18)!important;border-color:var(--hx-cyan)!important;\ncolor:#fff!important;box-shadow:0 0 12px rgba(56,226,255,.28)}\n.main-page .el-button--primary{border:non",
     "e!important;\nbackground:linear-gradient(120deg,var(--hx-cyan),var(--hx-blue))!important;color:#04121f!important}\n.main-page .el-button--primary:hover{box-shadow:0 0 18px rgba(56,226,255,.45)!important}\n\n/* ---- 开关 / 复选 / 单选 ---- */\n.main-page .el-switch.is-checked .el-switch__core{background:linear-gradient(120deg,var(--hx-cyan),var(--hx-blue))!important;\nborder-color:transparent!important}\n.main-page .el-switch__core{background:rgba(120,160,200,.28)!important;border-color:var(--hx-line)!important}\n.main-page .el-checkbox__label,.main-page .el-radio__label{color:var(--hx-ink-dim)!important}\n.main-page .el-checkbox__input.is-checked+.el-checkbox__label,.main-page .el-radio__input.is-checked+.el-radio__label{color:var(--hx-ink)!important}\n.main-page .el-checkbox__inner.is-checked,.main-page .el-radio__input.is-checked .el-radio__inner{\nbackground:var(--hx-cyan)!important;border-",
-    "color:var(--hx-cyan)!important}\n\n/* ---- 答案状态色（涨绿跌红不适用于此，用蓝/绿/琥珀/红）---- */\n.main-page .answer-result--success{color:#4ade80!important}\n.main-page .answer-result--searching{color:var(--hx-cyan)!important}\n.main-page .answer-result--pending{color:var(--hx-ink-dim)!important}\n.main-page .answer-result--error{color:#ff7a7a!important}\n\n/* ---- 答案标记 ---- */\n.main-page .answer-mark{background:rgba(56,226,255,.14)!important;border:1px solid var(--hx-line)!important}\n\n/* ---- 日志 ---- */\n.main-page .el-timeline-item__node{background:var(--hx-cyan)!important;box-shadow:0 0 8px rgba(56,226,255,.5)}\n.main-page .el-timeline-item__tail{border-left-color:var(--hx-line)!important}\n.main-page .log-success,.main-page .el-timeline-item__content{color:var(--hx-ink-dim)!important}\n.main-page .el-timeline-item__content strong{color:var(--hx-cyan)!important}\n\n/* ---- 滚动条 ---- */\n.main-page ::-",
+    "color:var(--hx-cyan)!important}\n\n/* ---- 答案状态色（涨绿跌红不适用于此，用蓝/绿/琥珀/红）---- */\n.main-page .answer-result--success{color:#4ade80!important}\n.main-page .answer-result--searching{color:var(--hx-cyan)!important}\n.main-page .answer-result--error{color:#ff7a7a!important}\n\n/* ---- 答案标记 ---- */\n.main-page .answer-mark{background:rgba(56,226,255,.14)!important;border:1px solid var(--hx-line)!important}\n\n/* ---- 日志 ---- */\n.main-page .el-timeline-item__node{background:var(--hx-cyan)!important;box-shadow:0 0 8px rgba(56,226,255,.5)}\n.main-page .el-timeline-item__tail{border-left-color:var(--hx-line)!important}\n.main-page .log-success,.main-page .el-timeline-item__content{color:var(--hx-ink-dim)!important}\n.main-page .el-timeline-item__content strong{color:var(--hx-cyan)!important}\n\n/* ---- 滚动条 ---- */\n.main-page ::-",
     "webkit-scrollbar{width:7px;height:7px}\n.main-page ::-webkit-scrollbar-track{background:rgba(255,255,255,.03);border-radius:4px}\n.main-page ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--hx-cyan),var(--hx-violet));\nborder-radius:4px;opacity:.6}\n.main-page ::-webkit-scrollbar-thumb:hover{opacity:.95}\n\n/* ---- 打赏区 ---- */\n.main-page .donate-card{border:1px solid rgba(255,190,110,.28)!important;border-radius:12px!important;\nbackground:linear-gradient(150deg,rgba(56,226,255,.10),rgba(255,140,190,.10))!important;\nbackdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}\n.main-page .donate-card h3{color:#ffd9a0!important}\n.main-page .donate-card p{color:var(--hx-ink-dim)!important}\n.main-page .donate-card strong{color:#ffc46b!important}\n.main-page .donate-card img{border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.42);\nbackground:#fff;padding:5px}\n\n/* -",
     "--- 最小化提示 ---- */\n.main-page .minus{color:var(--hx-ink-dim)!important}\n.main-page .overlay{background:rgba(4,10,24,.55)!important;backdrop-filter:blur(3px)}\n.main-page .modal{background:transparent!important}\n\n/* ---- Element Plus 弹层（下拉/提示）---- */\n.el-popper.is-light,.el-select-dropdown__item{border:1px solid var(--hx-line)!important;\nbackground:rgba(14,26,50,.94)!important;color:var(--hx-ink)!important;\nbackdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:var(--hx-shadow)!important}\n.el-select-dropdown__item{color:var(--hx-ink-dim)!important}\n.el-select-dropdown__item.is-hovering{background:rgba(56,226,255,.14)!important;color:#fff!important}\n.el-select-dropdown__item.is-selected{color:var(--hx-cyan)!important;font-weight:600}\n.el-popper__arrow::before{background:rgba(14,26,50,.94)!important;border-color:var(--hx-line)!important}\n.el-select__popper{backg",
     "round:transparent!important;border:none!important}\n.el-popper.is-dark{background:rgba(8,16,34,.95)!important;border:1px solid var(--hx-line)!important}\n"
@@ -7921,7 +7953,6 @@
     + "\n.main-page .answer-legend>span:before{content:\'\';position:absolute;left:6px;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor}"
     + "\n.main-page .answer-legend>.answer-result--success{color:#4ade80!important;border-color:rgba(74,222,128,.34)}"
     + "\n.main-page .answer-legend>.answer-result--searching{color:var(--hx-cyan)!important;border-color:rgba(56,226,255,.34)}"
-    + "\n.main-page .answer-legend>.answer-result--pending{color:#a8bcd8!important;border-color:rgba(168,188,216,.28)}"
     + "\n.main-page .answer-legend>.answer-result--error{color:#ff8a8a!important;border-color:rgba(255,138,138,.34)}"
     + "\n.main-page .question_table{border:1px solid var(--hx-line);border-radius:12px;background:rgba(8,16,34,.30);padding:0 0 2px}"
     + "\n.main-page .question-list{border-radius:12px;overflow:hidden}"
@@ -8321,6 +8352,23 @@ const layoutCss = LAYOUT_CSS_PARTS.join("");
       w.__HX_SESSION_RESET__ = () => resetSessionUsage();
       w.__HX_BALANCE__ = () => fetchBalance();
       w.__HX_STATUS__ = () => readPanelStatus();
+      w.__HX_STALL__ = () => ({
+        active: hxStallTimer !== null,
+        videos: hxCollectVideos().length,
+        scans: hxStallStats.scans,
+        soft: hxStallStats.soft,
+        hard: hxStallStats.hard,
+        lastAt: hxStallStats.lastAt
+      });
+      w.__HX_LOGSCROLL__ = () => ({
+        follow: hxLogFollow,
+        tabSeen: hxLogTabSeen,
+        targets: hxLogScrollTargets().map((el) => ({
+          cls: String(el.className || ""),
+          top: Math.round(el.scrollTop || 0),
+          max: Math.round(Math.max(el.scrollHeight - el.clientHeight, 0))
+        }))
+      });
       w.__HX_LINE__ = () => hxIdleLine;
       w.__HX_NAME__ = () => hxPetName();
       w.__HX_TAB__ = () => ({ active: hxActiveTabIndex(), labels: hxTabItems().map((el) => (el.textContent || "").trim()), autoJumped: hxAutoJumped, applied: hxDefaultTabApplied, busy: hxIsBusy(), wasBusy: hxWasBusy });
@@ -8362,6 +8410,12 @@ const layoutCss = LAYOUT_CSS_PARTS.join("");
           session: sessionUsage(),
           sessionBase: { requests: sessionBase.requests, totalTokens: sessionBase.totalTokens, cost: sessionBase.cost, at: sessionBase.at || 0 },
           uptimeMs: Math.max(Date.now() - (sessionBase.at || Date.now()), 0),
+          uptimeTotalMs: Number(usageStore.uptimeMs) || 0,
+          otherParamsLocked: (() => {
+            try {
+              return (useConfigStore().otherParams.params || []).map((p) => p.name + "=" + p.value);
+            } catch (error) { return null; }
+          })(),
           petName: hxPetName(),
           fav: { cost: hxFavCost(), level: hxFavLevelIdx() + 1, unlocked: hxLineCount(), total: hxFavTotalLines(), anchor: hxFavAnchor, inserts: hxFavInserts, mounted: !!(hxShadow && hxShadow.querySelector('.setting-fav-field')) },
           route: { active: hxActiveTabIndex(), autoJumped: hxAutoJumped, applied: hxDefaultTabApplied, sig: hxLastLogSig },
@@ -8389,6 +8443,15 @@ const layoutCss = LAYOUT_CSS_PARTS.join("");
   };
 
 
+  /* 状态页日志写入的统一入口。顺带修掉一个静默 bug：
+     bindLiquidGlass 里原来直接写 logStore.addLog(...)，而该作用域内并不存在
+     logStore 这个名字（它只在各 setup 内部定义）⇒ 每次点击都抛 ReferenceError，
+     又被外层 try/catch 吞掉，"本次用量归零"这条日志其实从来没出现过。 */
+  const hxLog = (message, type) => {
+    try { useLogStore().addLog(message, type); return true; }
+    catch (error) { return false; }
+  };
+
   /* ── 液态玻璃：滚动触发态 + 可点元素（本次用量重置 / 余额刷新）──── */
   const bindLiquidGlass = () => {
     const root = hxShadow;
@@ -8404,7 +8467,7 @@ const layoutCss = LAYOUT_CSS_PARTS.join("");
       if (!target || typeof target.closest !== "function") return;
       if (target.closest('[data-hx-cell="session"]')) {
         resetSessionUsage();
-        try { logStore.addLog("本次用量归零，重新数钱～", "primary"); } catch (error) {}
+        hxLog("本次用量归零，重新数钱～", "primary");
         return;
       }
       if (target.closest(".hero-balance")) fetchBalance();
@@ -8670,6 +8733,7 @@ const layoutCss = LAYOUT_CSS_PARTS.join("");
   const hxRouteTick = () => {
     const items = hxTabItems();
     if (items.length === 0) return;
+    try { hxSyncLogScroll(); } catch (error) { /* 忽略 */ }
     if (!hxDefaultTabApplied) {
       hxDefaultTabApplied = true;
       if (hxActiveTabIndex() === hxTabIdIndex(HX_TAB_LOG)) hxSwitchTab(hxTabIdIndex(HX_TAB_MAIN));
@@ -8712,6 +8776,223 @@ const layoutCss = LAYOUT_CSS_PARTS.join("");
     try { hxRouteTick(); } catch (error) { /* 忽略 */ }
     return true;
   };
+  /* ── 状态页：刷新 / 切回 / 有新日志时自动贴底，保证「最新状态」可见 ──
+     PRD v0.4.13。旧版状态页的 el-scrollbar 停在顶层，刷新后看到的是最早的几条
+     日志，最新的反而要手动往下拉。现在三个时机都自动贴底：
+       ① 页面刷新（面板挂载完成）② 切到「状态」页 ③ 有新日志写入。
+     主人自己往上翻时暂停跟随（不跟主人抢滚动条），回到底部附近再自动恢复跟随。
+     注意：未激活的 el-tab-pane 是 display:none，此时 scrollHeight 为 0，
+     所以"切页后"必须在可见之后再补几拍滚动，否则滚了个寂寞。 */
+  const HX_LOG_SCROLL_SELS = [".el-scrollbar__wrap", ".el-scrollbar__view", ".el-scrollbar"];
+  const HX_LOG_BOTTOM_TOLERANCE = 24;
+  const HX_LOG_PIN_DELAYS = [0, 120, 480, 1200];
+  let hxLogPrimary = null;
+  let hxLogFollow = true;
+  let hxLogObserver = null;
+  let hxLogTabSeen = false;
+  const hxLogScrollTargets = () => {
+    const root = hxShadow;
+    if (!root) return [];
+    const home = root.querySelector(".script-home");
+    if (!home) return [];
+    const list = [];
+    HX_LOG_SCROLL_SELS.forEach((sel) => {
+      const el = home.querySelector(sel);
+      if (el && list.indexOf(el) === -1) list.push(el);
+    });
+    try {
+      const pane = home.closest ? home.closest(".el-tab-pane") : null;
+      if (pane && list.indexOf(pane) === -1) list.push(pane);
+    } catch (error) { /* 忽略 */ }
+    return list;
+  };
+  const hxLogAtBottom = (el) => {
+    try { return el.scrollHeight - el.clientHeight - el.scrollTop <= HX_LOG_BOTTOM_TOLERANCE; }
+    catch (error) { return true; }
+  };
+  const hxLogScrollToBottom = (force) => {
+    const targets = hxLogScrollTargets();
+    if (!targets.length) return false;
+    if (!force && !hxLogFollow) return false;
+    let moved = false;
+    targets.forEach((el) => {
+      try {
+        if (typeof el.scrollTop !== "number") return;
+        const max = Math.max(el.scrollHeight - el.clientHeight, 0);
+        if (max <= 0) return;
+        el.scrollTop = max;
+        moved = true;
+      } catch (error) { /* 忽略 */ }
+    });
+    return moved;
+  };
+  const hxLogRefreshPin = () => {
+    hxLogFollow = true;
+    hxLogScrollToBottom(true);
+    HX_LOG_PIN_DELAYS.forEach((delay) => {
+      setTimeout(() => { try { hxLogScrollToBottom(true); } catch (error) { /* 忽略 */ } }, delay);
+    });
+    return true;
+  };
+  const bindLogAutoScroll = () => {
+    const root = hxShadow;
+    if (!root) return false;
+    const targets = hxLogScrollTargets();
+    if (!targets.length) return false;
+    const primary = targets[0];
+    if (hxLogPrimary !== primary) {
+      hxLogPrimary = primary;
+      hxLogFollow = true;
+      try {
+        primary.addEventListener("scroll", () => {
+          try { hxLogFollow = hxLogAtBottom(primary); } catch (error) { /* 忽略 */ }
+        }, { passive: true });
+      } catch (error) { /* 忽略 */ }
+      try {
+        if (hxLogObserver) hxLogObserver.disconnect();
+        hxLogObserver = new MutationObserver(() => {
+          try { hxLogScrollToBottom(false); } catch (error) { /* 忽略 */ }
+        });
+        hxLogObserver.observe(primary, { childList: true, subtree: true, characterData: true });
+      } catch (error) { hxLogObserver = null; }
+    }
+    return hxLogRefreshPin();
+  };
+  /* 路由巡检每拍调用：把"切到状态页"这个事件也接上贴底 */
+  const hxSyncLogScroll = () => {
+    const items = hxTabItems();
+    if (!items.length) return false;
+    const logIdx = hxTabIdIndex(HX_TAB_LOG);
+    if (logIdx < 0) return false;
+    if (hxActiveTabIndex() !== logIdx) {
+      hxLogTabSeen = false;
+      return false;
+    }
+    if (!hxLogTabSeen) {
+      hxLogTabSeen = true;
+      return hxLogRefreshPin();
+    }
+    return hxLogScrollToBottom(false);
+  };
+
+
+  /* ── 后台被动守护：视频卡顿自动重播（不展示为任何配置项）──────────
+     PRD：视频停止播放 / 卡顿，20 秒内未恢复就自动点击"重播"再试一次。
+     判定：视频处于播放态（!paused && !ended）却 currentTime 长时间不前进。
+       10s 轻量自救：补一次 play()（应对"播放态但其实被挂起"的情形）；
+       20s 仍未前进：在播放器里找「重播 / 重新播放」按钮点击，并强制再一次 play()。
+     安全性：只在 !paused 时动作 ⇒ 主人自己暂停的视频、答题暂停的视频都不会被抢播；
+             seeking / readyState 未就绪时重置基线，不把缓冲当成卡死；
+             单个视频最多自救 20 次，避免在彻底坏掉的播放器上空转。
+     覆盖范围：主文档 + 同源 iframe（跨域 iframe 静默跳过）。
+     全程静默后台运行，只在状态页留一行日志。 */
+  const HX_STALL_SOFT_MS = 1e4;
+  const HX_STALL_HARD_MS = 2e4;
+  const HX_STALL_TICK_MS = 1e3;
+  const HX_STALL_MOVE_EPS = 0.05;
+  const HX_STALL_MAX_REPLAY = 20;
+  const HX_REPLAY_TEXT_RE = /^(重播|重新播放|再次播放|再看一次|replay)$/i;
+  const hxStallState = /* @__PURE__ */ new WeakMap();
+  const hxStallStats = { scans: 0, soft: 0, hard: 0, lastAt: 0 };
+  let hxStallTimer = null;
+  const hxCollectVideos = () => {
+    const out = [];
+    try {
+      document.querySelectorAll("video").forEach((el) => { if (el) out.push(el); });
+    } catch (error) { /* 忽略 */ }
+    try {
+      document.querySelectorAll("iframe").forEach((frame) => {
+        try {
+          const doc = frame.contentDocument;
+          if (doc) doc.querySelectorAll("video").forEach((el) => { if (el) out.push(el); });
+        } catch (error) { /* 跨域 iframe：跳过 */ }
+      });
+    } catch (error) { /* 忽略 */ }
+    return out;
+  };
+  const hxFindReplayButton = (doc) => {
+    if (!doc || typeof doc.querySelectorAll !== "function") return null;
+    let hit = null;
+    try {
+      doc.querySelectorAll("button,a,span,div,i,li").forEach((el) => {
+        if (hit) return;
+        const label = String((el.textContent || "")).trim();
+        if (label && label.length <= 6 && HX_REPLAY_TEXT_RE.test(label)) { hit = el; return; }
+        const tip = String((el.getAttribute && (el.getAttribute("title") || el.getAttribute("aria-label"))) || "").trim();
+        if (tip && HX_REPLAY_TEXT_RE.test(tip)) hit = el;
+      });
+    } catch (error) { /* 忽略 */ }
+    return hit;
+  };
+  const hxForceReplay = (media) => {
+    let clicked = false;
+    try {
+      const btn = hxFindReplayButton(media.ownerDocument);
+      if (btn) { btn.click(); clicked = true; }
+    } catch (error) { /* 忽略 */ }
+    if (!clicked) {
+      try { if (media.ended || media.currentTime > 0) media.currentTime = 0; }
+      catch (error) { /* 忽略：只读播放器 */ }
+    }
+    try {
+      const pending = media.play();
+      if (pending && typeof pending.catch === "function") pending.catch(() => {});
+    } catch (error) { /* 忽略 */ }
+    return clicked;
+  };
+  const hxStallReset = (state2, media, now) => {
+    state2.at = now;
+    state2.time = Number(media.currentTime) || 0;
+    state2.soft = false;
+  };
+  const hxStallTick = () => {
+    const now = Date.now();
+    hxStallStats.scans += 1;
+    hxCollectVideos().forEach((media) => {
+      let state2 = hxStallState.get(media);
+      if (!state2) {
+        state2 = { at: now, time: Number(media.currentTime) || 0, soft: false, replays: 0 };
+        hxStallState.set(media, state2);
+      }
+      try {
+        if (media.paused || media.ended || media.seeking) {
+          hxStallReset(state2, media, now);
+          return;
+        }
+        if (Math.abs((Number(media.currentTime) || 0) - state2.time) > HX_STALL_MOVE_EPS) {
+          hxStallReset(state2, media, now);
+          return;
+        }
+        const stall = now - state2.at;
+        if (stall >= HX_STALL_HARD_MS && state2.replays < HX_STALL_MAX_REPLAY) {
+          state2.replays += 1;
+          hxStallReset(state2, media, now);
+          hxStallStats.hard += 1;
+          hxStallStats.lastAt = now;
+          const clicked = hxForceReplay(media);
+          /* v0.5.1：自动重播触发时，在状态页留一条一眼能认出的通知。
+             后台被动运行，不出现在任何配置项里。 */
+          hxLog("【自动重播】检测到视频卡住，鲸娘自动戳一下" + (clicked ? "重播" : "播放") + "～（第 " + state2.replays
+            + " 次 · 停顿 " + Math.round(stall / 1e3) + " 秒）", "warning");
+          return;
+        }
+        if (stall >= HX_STALL_SOFT_MS && !state2.soft) {
+          state2.soft = true;
+          hxStallStats.soft += 1;
+          try {
+            const pending = media.play();
+            if (pending && typeof pending.catch === "function") pending.catch(() => {});
+          } catch (error) { /* 忽略 */ }
+        }
+      } catch (error) { /* 忽略：单个视频异常不影响守护 */ }
+    });
+  };
+  const bindStallGuard = () => {
+    if (hxStallTimer === null)
+      hxStallTimer = setInterval(() => { try { hxStallTick(); } catch (error) { /* 忽略 */ } }, HX_STALL_TICK_MS);
+    return true;
+  };
+
 
   /* ── 好感度面板：挂在小名下面，ⓘ 可展开说明 ───────────── */
   let hxFavOpen = false;
@@ -8944,6 +9225,7 @@ const layoutCss = LAYOUT_CSS_PARTS.join("");
             if (hidden)
               console.warn("[探矿鲸娘] 已隐藏 " + hidden + " 个旧版/重复面板宿主，新版面板已置于最上层");
           } catch (error2) { /* 忽略 */ }
+          try { bindLogAutoScroll(); } catch (error2) { /* 忽略 */ }
         }, delay);
       });
       try { bindLiquidGlass(); } catch (error2) { /* 忽略 */ }
@@ -8951,6 +9233,9 @@ const layoutCss = LAYOUT_CSS_PARTS.join("");
       try { bindIdleLines(); } catch (error2) { /* 忽略 */ }
       try { bindTabRouter(); } catch (error2) { /* 忽略 */ }
       try { bindFavCard(); } catch (error2) { /* 忽略 */ }
+      try { bindLogAutoScroll(); } catch (error2) { /* 忽略 */ }
+      try { bindStallGuard(); } catch (error2) { /* 忽略 */ }
+      try { bindUptimeMeter(); } catch (error2) { /* 忽略 */ }
       setTimeout(() => {
         try { fetchBalance(); } catch (error2) { /* 忽略 */ }
       }, 1200);
