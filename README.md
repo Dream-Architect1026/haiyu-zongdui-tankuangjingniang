@@ -1,6 +1,6 @@
 <div align="center">
 
-# 海底小纵队 · D-Whaler
+# D-Whaler
 
 **超星（学习通）自动刷课与 AI 答题助手（纯免费）**
 
@@ -46,7 +46,7 @@
 推荐使用 **脚本猫（ScriptCat）** 承载：
 
 1. 在 Edge / Chrome 应用商店安装 [脚本猫](https://scriptcat.org/) 扩展。
-2. 下载本仓库的 [`海底小纵队·探矿鲸娘.user.js`](海底小纵队·探矿鲸娘.user.js)（或直接拖入浏览器），脚本猫会弹出安装页，点击「安装」。
+2. 下载本仓库的 [`D-Whaler.user.js`](D-Whaler.user.js)（或直接拖入浏览器），脚本猫会弹出安装页，点击「安装」。
 3. 安装后访问学习通课程页面，即可看到助手面板。
 
 > 也可使用篡改猴（Tampermonkey）。
@@ -147,7 +147,7 @@
 
 ```
 .
-├── 海底小纵队·探矿鲸娘.user.js   # 现行版本 0.5.1（脚本标题已改为 D-Whaler）
+├── D-Whaler.user.js   # 现行版本 0.5.1（脚本标题已改为 D-Whaler）
 ├── CHANGELOG.md                  # 完整更新说明（0.2.7 → 0.5.1）
 ├── LICENSE                       # MIT
 ├── assets/                       # 图标、打赏码（README 展示用）
@@ -164,6 +164,6 @@
 
 <div align="center">
 
-<sub>星虹 · 算力调度 提供计算服务</sub>
+<sub>星虹 · 算力调度 提供开发服务</sub>
 
 </div>
